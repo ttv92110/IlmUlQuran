@@ -1,4 +1,4 @@
-# api/domain/models.py 
+# api/domain/models.py
 
 from datetime import datetime, timezone
 from typing import Optional, List, Dict
@@ -20,13 +20,13 @@ class NoteStatus(str, Enum):
     REJECTED = "rejected"
 
 class WaqfType(str, Enum):
-    LAZIM = "م"          # لازم – stop necessary
-    JAAIZ = "ج"          # جائز – can stop or continue
-    MURAKH_KHAS = "ط"    # مطلق – absolute stop
-    SILE = "صلے"         # صلی – permissible stop
-    QILE = "قلے"         # قلی – better to stop
-    LA = "لا"            # لا – do not stop
-    ZAJR = "ز"           # زجر – stop with reprimand
+    LAZIM = "م"
+    JAAIZ = "ج"
+    MURAKH_KHAS = "ط"
+    SILE = "صلے"
+    QILE = "قلے"
+    LA = "لا"
+    ZAJR = "ز"
 
 class PartOfSpeech(str, Enum):
     NOUN = "noun"
@@ -100,6 +100,7 @@ class Ayah(BaseModel):
     global_ayah_number: int = Field(..., ge=1)
     arabic_text: str
     arabic_without_harakat: Optional[str] = ""
+    arabic_normalized: Optional[str] = ""          # 🆕 from JSON
     transliteration: Optional[str] = ""
     translations: Dict[str, str] = Field(default_factory=dict)
     waqf_marks: List[WaqfMark] = Field(default_factory=list)
@@ -126,6 +127,7 @@ class Ayah(BaseModel):
                 "ayah_number": 255,
                 "global_ayah_number": 255,
                 "arabic_text": "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ",
+                "arabic_normalized": "الله لا اله الا هو الحي القيوم",
                 "translations": {"ur": "اللہ کے سوا کوئی معبود نہیں"},
                 "juz_number": 3,
                 "hizb_number": 5,
@@ -307,10 +309,10 @@ class Word(BaseModel):
     global_ayah_number: int
     position_in_ayah: int
     arabic_word: str
+    arabic_without_harakat: Optional[str] = ""   # 🆕 from JSON (with_out_arabic)
+    arabic_normalized: Optional[str] = ""        # 🆕 from JSON
+    normalized_letters: Optional[str] = ""       # 🆕 from JSON (space-separated letters)
     root_word: Optional[str] = None
-    root_meaning: Optional[str] = None
-    urdu_meaning: Optional[str] = None
-    english_meaning: Optional[str] = None
     transliteration: Optional[str] = None
     abjad_value: int = 0
     letter_count: int = 0
@@ -328,14 +330,17 @@ class Word(BaseModel):
                 "global_ayah_number": 1,
                 "position_in_ayah": 1,
                 "arabic_word": "بِسْمِ",
+                "arabic_without_harakat": "بسم",
+                "arabic_normalized": "بسم",
+                "normalized_letters": "ب س م",
                 "root_word": "ب س م",
-                "urdu_meaning": "نام سے",
-                "english_meaning": "In the name",
+                "transliteration": "bis'mi",
                 "abjad_value": 102,
-                "letter_count": 4,
-                "letter_frequency": {"ب": 1, "س": 1, "م": 1, "ِ": 1},
-                "symoble_count": 4,
-                "symoble_frequency": {"ْ":1, "ُ": 1, "َ": 1, "ِ": 1}
+                "letter_count": 3,
+                "letter_frequency": {"ب": 1, "س": 1, "م": 1},
+                "symoble_count": 2,
+                "symoble_frequency": {"ِ": 2},
+                "translations": {"ur": "نام سے", "en": "In the name"}
             }
         }
 
