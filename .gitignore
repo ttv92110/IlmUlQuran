@@ -184,7 +184,7 @@ dmypy.json
 api/credentials.json
 credentials.json
 # *.json
-vercel.json
+# vercel.json
 # Pyre type checker
 .pyre/
 
