@@ -156,11 +156,9 @@ api/scripts/
 data/Translate/
 
 # Generated JSON files
-data/quran_arabi.json
-data/quran_array.json
-data/quran.json
 data/ruku.json
-data/word_meanings_final.json
+data/unique_phrases.json
+data/quran_word_by_word_en.json
 
 # Logs
 logs/
@@ -185,7 +183,8 @@ dmypy.json
 # Google Sheets credentials
 api/credentials.json
 credentials.json
-*.json
+# *.json
+vercel.json
 # Pyre type checker
 .pyre/
 
