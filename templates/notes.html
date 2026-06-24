@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head><title>Community Notes</title>
+    <link rel="stylesheet" href="/static/css/new_styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>📝 Community Notes & Tafsir</h1>
+        <div id="loginPrompt" class="warning" style="background:#fff3e0; padding:1rem; border-radius:20px;">🔒 Please <a href="/login">login</a> to contribute.</div>
+        <div id="userNotes" style="display:none;">
+            <h3>✍️ My Notes</h3>
+            <div id="myNotesList" style="background:#fef9ef; padding:1rem; border-radius:20px;"></div>
+            <hr>
+            <h3>➕ Add New Note</h3>
+            <input type="number" id="ayahGlobalId" placeholder="Global Ayah Number">
+            <select id="noteType"><option value="tafsir">Tafsir</option><option value="linguistic">Linguistic</option><option value="abjad">Abjad</option></select>
+            <textarea id="noteContent" rows="4" placeholder="Your note..."></textarea>
+            <button id="submitNote">Submit Note</button>
+        </div>
+        <hr>
+        <h3>🔎 Search Notes by Ayah</h3>
+        <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+            <input type="number" id="searchAyah" placeholder="Global Ayah Number">
+            <button id="searchNoteBtn">Show Notes</button>
+        </div>
+        <div id="notesResults" style="margin-top:1rem;"></div>
+    </div>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script>
+        let currentUser = null;
+        async function checkAuth() {
+            currentUser = await getCurrentUser();
+            if(currentUser) {
+                document.getElementById('loginPrompt').style.display = 'none';
+                document.getElementById('userNotes').style.display = 'block';
+                loadMyNotes();
+            }
+        }
+        async function loadMyNotes() {
+            const notes = await apiRequest('/notes/my');
+            document.getElementById('myNotesList').innerHTML = notes.map(n => `<div style="border-bottom:1px solid #e0d5c0; padding:0.5rem 0;">${n.content} <span style="background:#e0d5c0; border-radius:12px; padding:0.2rem 0.6rem;">${n.status}</span></div>`).join('');
+        }
+        document.getElementById('submitNote').addEventListener('click', async () => {
+            const ayah = parseInt(document.getElementById('ayahGlobalId').value);
+            const type = document.getElementById('noteType').value;
+            const content = document.getElementById('noteContent').value.trim();
+            if(!ayah || !content) return alert('Ayah number and content required');
+            await apiRequest('/notes', { method: 'POST', body: JSON.stringify({ ayah_global_id: ayah, note_type: type, content }) });
+            alert('Note submitted for verification');
+            location.reload();
+        });
+        document.getElementById('searchNoteBtn').addEventListener('click', async () => {
+            const ayahId = document.getElementById('searchAyah').value;
+            if(!ayahId) return;
+            const notes = await apiRequest(`/notes/ayah/${ayahId}`);
+            document.getElementById('notesResults').innerHTML = notes.map(n => `<div class="result-card"><strong>${n.note_type}</strong>: ${n.content}<br><small>Status: ${n.status}</small></div>`).join('');
+        });
+        checkAuth();
+    </script>
+</body>
+</html>

@@ -1,0 +1,308 @@
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', 'Noto Nastaliq Urdu', 'Amiri', serif;
+            background: linear-gradient(135deg, #fef9e6 0%, #f5ebd2 100%);
+            color: #2c2b28;
+            line-height: 1.6;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+        header {
+            background: linear-gradient(135deg, #0b3b2f 0%, #144d3c 100%);
+            color: white;
+            padding: 0.8rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        header .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .logo { font-size: 1.8rem; font-weight: 700; color: white; }
+        nav { display: flex; gap: 1.5rem; align-items: center; }
+        nav a { color: #f5e7c8; text-decoration: none; font-weight: 500; transition: color 0.3s; }
+        nav a:hover { color: #ffd966; }
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 20px 0;
+        }
+        .btn {
+            background: linear-gradient(135deg, #0b3b2f, #1e6b5e);
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.15); background: linear-gradient(135deg, #1e6b5e, #2a8a7a); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-small { padding: 0.3rem 0.8rem; font-size: 0.8rem; }
+        .jumper {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            background: white;
+            padding: 0.3rem 1rem;
+            border-radius: 50px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .jumper input { width: 80px; padding: 0.5rem; border-radius: 30px; border: 1px solid #c9a34b; font-family: inherit; text-align: center; }
+        .jumper span { font-weight: bold; color: #c9a34b; }
+        .ayah-card {
+            background: white;
+            border-radius: 32px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            text-align: center;
+            border-left: 8px solid #c9a34b;
+        }
+        .surah-title { font-size: 1.6rem; color: #1e2a2e; margin-bottom: 0.5rem; }
+        .surah-meaning { font-size: 1rem; color: #6b6b6b; margin-bottom: 1rem; }
+        .ayah-header { font-size: 0.9rem; color: #c9a34b; font-weight: 600; letter-spacing: 1px; margin-bottom: 0.5rem; }
+        .arabic-text { font-size: 2.2rem; font-family: 'Amiri', serif; line-height: 1.8; margin: 1rem 0; direction: rtl; text-align: center; }
+        .translations { background: #f9f6ed; padding: 1rem; border-radius: 24px; margin-top: 0.8rem; font-size: 1.1rem; font-family: 'Noto Nastaliq Urdu', serif; }
+        .lang-selector { display: flex; justify-content: flex-end; margin-bottom: 1rem; gap: 0.5rem; align-items: center; }
+        .lang-selector select { padding: 0.5rem 1rem; border-radius: 30px; border: 1px solid #c9a34b; background: white; font-family: inherit; cursor: pointer; }
+        .words-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            gap: 1rem;
+            margin: 2rem 0;
+            direction: rtl;
+        }
+        .word-card {
+            background: white;
+            border-radius: 20px;
+            padding: 0.8rem;
+            min-width: 180px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 1px solid #f0e6d5;
+            direction: rtl;
+        }
+        .word-card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-color: #c9a34b; }
+        .word-arabic { font-size: 1.4rem; font-family: 'Amiri', serif; direction: rtl; }
+        .word-translit { font-size: 0.7rem; color: #888; margin: 0.3rem 0; direction: ltr; }
+        .word-urdu { font-size: 0.8rem; font-weight: 500; color: #2c553f; margin: 0.2rem 0; font-family: 'Noto Nastaliq Urdu', serif; }
+        .word-english { font-size: 0.75rem; color: #4a4a4a; margin: 0.2rem 0; }
+        .word-meta { font-size: 0.7rem; color: #c9a34b; margin-top: 0.3rem; }
+        .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 2rem 0; }
+        .stats-panel, .freq-panel { background: white; border-radius: 28px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .stats-panel h3, .freq-panel h3 { border-left: 5px solid #c9a34b; padding-left: 1rem; margin-bottom: 1rem; font-size: 1.3rem; }
+        .stat-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #f0e6d5; }
+        .stat-label { font-weight: 600; color: #4a4a4a; }
+        .stat-value { font-weight: 700; color: #1e6b5e; }
+        .sajdah-yes { background: #ffd966; color: #1e2a2e; padding: 0.2rem 0.8rem; border-radius: 20px; display: inline-block; }
+        .tag-container { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+        .tag { background: #f0f0f0; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem; }
+        hr { margin: 1rem 0; border-color: #e0d5c0; }
+        footer { text-align: center; background: #1e2a2e; color: #ccc; padding: 1.5rem; margin-top: 3rem; }
+        /* Notes styling */
+        .notes-section {
+            background: white;
+            border-radius: 28px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .notes-section h3 {
+            border-left: 5px solid #c9a34b;
+            padding-left: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .note-card {
+            background: #fef9ef;
+            border-radius: 24px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #f0e6d5;
+        }
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            color: #6b6b6b;
+        }
+        .note-title {
+            font-weight: bold;
+            color: #1e6b5e;
+            font-size: 1rem;
+        }
+        .note-content {
+            margin: 0.8rem 0;
+            line-height: 1.5;
+        }
+        .note-status {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .status-pending { background: #ffd966; color: #1e2a2e; }
+        .status-verified { background: #a5d6a5; color: #1e5e1e; }
+        .status-rejected { background: #f4acb7; color: #8b3c3c; }
+        .note-actions button { margin-left: 0.5rem; }
+        .add-note-form {
+            background: #f9f6ed;
+            border-radius: 24px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+        .add-note-form input, .add-note-form select, .add-note-form textarea {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border: 1px solid #e0d5c0;
+            border-radius: 20px;
+            font-family: inherit;
+        }
+        .login-prompt {
+            text-align: center;
+            padding: 1rem;
+            background: #fef9ef;
+            border-radius: 20px;
+        }
+        @media (max-width: 768px) {
+            .dashboard { grid-template-columns: 1fr; }
+            .words-grid { gap: 0.5rem; }
+            .word-card { min-width: 150px; }
+            .jumper input { width: 70px; }
+        }
+
+
+
+/* 
+ 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', 'Noto Nastaliq Urdu', 'Amiri', serif;
+            background: linear-gradient(135deg, #fef9e6 0%, #f5ebd2 100%);
+            color: #2c2b28;
+            line-height: 1.6;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+        header {
+            background: linear-gradient(135deg, #0b3b2f 0%, #144d3c 100%);
+            color: white;
+            padding: 0.8rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        header .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .logo { font-size: 1.8rem; font-weight: 700; color: white; }
+        nav { display: flex; gap: 1.5rem; align-items: center; }
+        nav a { color: #f5e7c8; text-decoration: none; font-weight: 500; transition: color 0.3s; }
+        nav a:hover { color: #ffd966; }
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 20px 0;
+        }
+        .btn {
+            background: linear-gradient(135deg, #0b3b2f, #1e6b5e);
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.15); background: linear-gradient(135deg, #1e6b5e, #2a8a7a); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .jumper {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            background: white;
+            padding: 0.3rem 1rem;
+            border-radius: 50px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .jumper input {
+            width: 80px;
+            padding: 0.5rem;
+            border-radius: 30px;
+            border: 1px solid #c9a34b;
+            font-family: inherit;
+            text-align: center;
+        }
+        .jumper span { font-weight: bold; color: #c9a34b; }
+        .ayah-card {
+            background: white;
+            border-radius: 32px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            text-align: center;
+            border-left: 8px solid #c9a34b;
+        }
+        .surah-title { font-size: 1.6rem; color: #1e2a2e; margin-bottom: 0.5rem; }
+        .surah-meaning { font-size: 1rem; color: #6b6b6b; margin-bottom: 1rem; }
+        .ayah-header { font-size: 0.9rem; color: #c9a34b; font-weight: 600; letter-spacing: 1px; margin-bottom: 0.5rem; }
+        .arabic-text { font-size: 2.2rem; font-family: 'Amiri', serif; line-height: 1.8; margin: 1rem 0; direction: rtl; text-align: center; }
+        .translations { background: #f9f6ed; padding: 1rem; border-radius: 24px; margin-top: 0.8rem; font-size: 1.1rem; font-family: 'Noto Nastaliq Urdu', serif; }
+        .lang-selector { display: flex; justify-content: flex-end; margin-bottom: 1rem; gap: 0.5rem; align-items: center; }
+        .lang-selector select { padding: 0.5rem 1rem; border-radius: 30px; border: 1px solid #c9a34b; background: white; font-family: inherit; cursor: pointer; }
+        .words-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            gap: 1rem;
+            margin: 2rem 0;
+            direction: rtl;
+        }
+        .word-card {
+            background: white;
+            border-radius: 20px;
+            padding: 0.8rem;
+            min-width: 180px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 1px solid #f0e6d5;
+            direction: rtl;
+        }
+        .word-card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-color: #c9a34b; }
+        .word-arabic { font-size: 1.4rem; font-family: 'Amiri', serif; direction: rtl; }
+        .word-translit { font-size: 0.7rem; color: #888; margin: 0.3rem 0; direction: ltr; }
+        .word-urdu { font-size: 0.8rem; font-weight: 500; color: #2c553f; margin: 0.2rem 0; font-family: 'Noto Nastaliq Urdu', serif; }
+        .word-english { font-size: 0.75rem; color: #4a4a4a; margin: 0.2rem 0; }
+        .word-meta { font-size: 0.7rem; color: #c9a34b; margin-top: 0.3rem; }
+        .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 2rem 0; }
+        .stats-panel, .freq-panel { background: white; border-radius: 28px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .stats-panel h3, .freq-panel h3 { border-left: 5px solid #c9a34b; padding-left: 1rem; margin-bottom: 1rem; font-size: 1.3rem; }
+        .stat-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #f0e6d5; }
+        .stat-label { font-weight: 600; color: #4a4a4a; }
+        .stat-value { font-weight: 700; color: #1e6b5e; }
+        .sajdah-yes { background: #ffd966; color: #1e2a2e; padding: 0.2rem 0.8rem; border-radius: 20px; display: inline-block; }
+        .tag-container { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+        .tag { background: #f0f0f0; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem; }
+        hr { margin: 1rem 0; border-color: #e0d5c0; }
+        footer { text-align: center; background: #1e2a2e; color: #ccc; padding: 1.5rem; margin-top: 3rem; }
+        @media (max-width: 768px) {
+            .dashboard { grid-template-columns: 1fr; }
+            .words-grid { gap: 0.5rem; }
+            .word-card { min-width: 150px; }
+            .jumper input { width: 70px; }
+        }  */

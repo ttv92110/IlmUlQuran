@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head><title>Abjad Calculator</title>
+    <link rel="stylesheet" href="/static/css/new_styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🔢 Abjad Calculator</h1>
+        <input type="text" id="wordInput" placeholder="Type Arabic word/phrase (e.g., الله)">
+        <button id="calculateBtn">Calculate Abjad</button>
+        <div id="result"></div>
+        <hr>
+        <h3>Letter Mappings (click on any letter to add it to the input)</h3>
+        <div id="mappings" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:0.5rem;"></div>
+    </div>
+    
+    <script src="/static/js/api.js"></script>
+    <script>
+        async function loadMappings() {
+            const mappings = await apiRequest('/abjad/mappings');
+            const container = document.getElementById('mappings');
+            container.innerHTML = mappings.map(m => `
+                <div class="mapping-item" data-letter="${m.letter}" style="background:#fff; padding:0.5rem; border-radius:12px; text-align:center; cursor:pointer; transition:0.2s;">
+                    <strong>${m.letter}</strong> = ${m.abjad_value}
+                </div>
+            `).join('');
+
+            // Add click listeners to each mapping div
+            document.querySelectorAll('.mapping-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const letter = item.getAttribute('data-letter');
+                    const input = document.getElementById('wordInput');
+                    input.value += letter;   // Append the letter
+                    input.focus();           // Focus back to input for continuous typing
+                });
+                // Optional hover effect
+                item.addEventListener('mouseenter', () => {
+                    item.style.backgroundColor = '#c9a34b';
+                    item.style.color = 'white';
+                });
+                item.addEventListener('mouseleave', () => {
+                    item.style.backgroundColor = '#fff';
+                    item.style.color = '';
+                });
+            });
+        }
+
+        document.getElementById('calculateBtn').addEventListener('click', async () => {
+            const word = document.getElementById('wordInput').value.trim();
+            if(!word) return;
+            const data = await apiRequest(`/abjad/word/${encodeURIComponent(word)}`);
+            document.getElementById('result').innerHTML = `<div style="background:#eef2e5; padding:1rem; border-radius:50px; text-align:center;"><strong>Abjad Value:</strong> ${data.abjad_value}</div>`;
+        });
+
+        loadMappings();
+    </script>
+</body>
+</html>

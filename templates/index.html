@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>علم القرآن - Quran Knowledge Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital@0;1&family=Noto+Nastaliq+Urdu&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/css/new_styles.css">
+    
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="logo">علم القرآن</h1>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/quran">Quran</a>
+                <a href="/search">Search</a>
+                <a href="/abjad">Abjad</a>
+                <!-- <a href="/notes">Notes</a> -->
+                <a href="/analytics">Analytics</a>   <!-- new -->
+                <div id="auth-buttons"></div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="hero">
+                <h2>۞ Welcome to Ilm ul Quran ۞</h2>
+                <p>Comprehensive Quran knowledge platform with word-by-word meanings, Abjad calculations, and community research.</p>
+            </section>
+
+            <section class="features">
+                <div class="card">
+                    <h3>📖 Read Quran</h3>
+                    <p>Browse Surahs and Ayahs with multiple translations.</p>
+                    <a href="/quran" class="btn">Start Reading →</a>
+                </div>
+                <div class="card">
+                    <h3>🔍 Advanced Search</h3>
+                    <p>Search by word, root, Abjad value, or full text.</p>
+                    <a href="/search" class="btn">Search Now →</a>
+                </div>
+                <div class="card">
+                    <h3>🔢 Abjad System</h3>
+                    <p>Calculate Abjad values of words and discover numeric patterns.</p>
+                    <a href="/abjad" class="btn">Calculate →</a>
+                </div>
+                <!-- <div class="card">
+                    <h3>📝 Community Notes</h3>
+                    <p>Contribute Tafsir, research, and linguistic insights.</p>
+                    <a href="/notes" class="btn">Explore Notes →</a>
+                </div> -->
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2025 Ilm ul Quran — Open source knowledge platform</p>
+    </footer>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

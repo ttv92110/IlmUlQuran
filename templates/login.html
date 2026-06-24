@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Register | Ilm Ul Quran</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    
+    
+    <link rel="stylesheet" href="/static/css/login.css">
+</head>
+<body>
+<div class="auth-card">
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="login">🔐 Login</button>
+        <button class="tab-btn" data-tab="register">📝 Register</button>
+    </div>
+
+    <!-- Login Pane -->
+    <div id="loginPane" class="tab-pane active">
+        <form id="loginForm">
+            <div class="form-group"><label>Email</label><input type="email" id="loginEmail" required></div>
+            <div class="form-group"><label>Password</label><input type="password" id="loginPassword" required></div>
+            <button type="submit" class="btn-primary">Login</button>
+            <div id="loginError" class="error-message"></div>
+        </form>
+        <div class="switch-text">Don't have an account? <a id="switchToRegister">Register here</a></div>
+    </div>
+
+    <!-- Register Pane -->
+    <div id="registerPane" class="tab-pane">
+        <form id="registerForm">
+            <div class="form-group"><label>Full Name *</label><input type="text" id="regName" required></div>
+            <div class="form-group"><label>Email *</label><input type="email" id="regEmail" required></div>
+            <div class="form-group"><label>Password * (min 8 chars)</label><input type="password" id="regPassword" required></div>
+            <div class="form-group"><label>Mobile Number *</label><input type="tel" id="regMobile" required></div>
+            <div class="form-group"><label>CNIC (13 digits) *</label><input type="text" id="regCnic" pattern="\d{13}" required></div>
+            <div class="form-group"><label>Profile Picture (optional)</label><input type="file" id="regProfilePic" accept="image/*" class="file-input"></div>
+            <div class="form-group"><label>CNIC Front Picture *</label><input type="file" id="regCnicPic" accept="image/*" required class="file-input"></div>
+            <div id="profilePreview" class="image-preview"></div>
+            <div id="cnicPreview" class="image-preview"></div>
+            <button type="submit" class="btn-primary">Register & Verify Email</button>
+            <div id="regError" class="error-message"></div>
+            <div id="regSuccess" class="success-message"></div>
+        </form>
+        <div class="switch-text">Already have an account? <a id="switchToLogin">Login here</a></div>
+    </div>
+</div>
+
+<!-- Verification Modal -->
+<div id="verificationModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>📧 Verify Your Email</h3>
+        <p>We sent a 6‑digit PIN to <strong id="verifyEmail"></strong>. Enter it below:</p>
+        <div class="pin-input">
+            <input type="text" maxlength="1" class="pin-digit"> <input type="text" maxlength="1" class="pin-digit">
+            <input type="text" maxlength="1" class="pin-digit"> <input type="text" maxlength="1" class="pin-digit">
+            <input type="text" maxlength="1" class="pin-digit"> <input type="text" maxlength="1" class="pin-digit">
+        </div>
+        <div id="verifyError" class="error-message"></div>
+        <div id="verifySuccess" class="success-message"></div>
+        <div class="modal-buttons">
+            <button id="verifyPinBtn" class="btn-primary">Verify</button>
+            <button id="resendPinBtn" class="btn-secondary">Resend PIN</button>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/api.js"></script>
+<script>
+    // Tab switching
+    const tabs = document.querySelectorAll('.tab-btn');
+    const loginPane = document.getElementById('loginPane');
+    const registerPane = document.getElementById('registerPane');
+    tabs.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabs.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const tab = btn.dataset.tab;
+            loginPane.classList.toggle('active', tab === 'login');
+            registerPane.classList.toggle('active', tab === 'register');
+        });
+    });
+    document.getElementById('switchToRegister').addEventListener('click', () => {
+        document.querySelector('.tab-btn[data-tab="register"]').click();
+    });
+    document.getElementById('switchToLogin').addEventListener('click', () => {
+        document.querySelector('.tab-btn[data-tab="login"]').click();
+    });
+
+    // Image preview
+    function previewImage(fileInput, previewDiv) {
+        const file = fileInput.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = e => { previewDiv.innerHTML = `<img src="${e.target.result}">`; };
+            reader.readAsDataURL(file);
+        }
+    }
+    document.getElementById('regProfilePic').addEventListener('change', function() {
+        previewImage(this, document.getElementById('profilePreview'));
+    });
+    document.getElementById('regCnicPic').addEventListener('change', function() {
+        previewImage(this, document.getElementById('cnicPreview'));
+    });
+
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    let pendingEmail = null;
+
+    function showModal() { document.getElementById('verificationModal').classList.add('active'); }
+    function hideModal() { document.getElementById('verificationModal').classList.remove('active'); }
+
+    // Registration
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('regName').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const mobile = document.getElementById('regMobile').value.trim();
+        const cnic = document.getElementById('regCnic').value.trim();
+        const profilePicFile = document.getElementById('regProfilePic').files[0];
+        const cnicPicFile = document.getElementById('regCnicPic').files[0];
+        const errorDiv = document.getElementById('regError');
+        const successDiv = document.getElementById('regSuccess');
+        errorDiv.innerText = ''; successDiv.innerText = '';
+
+        if (!name || !email || !password || !mobile || !cnic || !cnicPicFile) {
+            errorDiv.innerText = 'All required fields must be filled.';
+            return;
+        }
+        if (password.length < 8) { errorDiv.innerText = 'Password must be at least 8 characters.'; return; }
+        if (!/^\d{13}$/.test(cnic)) { errorDiv.innerText = 'CNIC must be 13 digits.'; return; }
+
+        let profilePicBase64 = '', cnicPicBase64 = '';
+        try {
+            if (profilePicFile) profilePicBase64 = await fileToBase64(profilePicFile);
+            cnicPicBase64 = await fileToBase64(cnicPicFile);
+        } catch(err) { errorDiv.innerText = 'Error reading images.'; return; }
+
+        try {
+            await apiRequest('/auth/register', {
+                method: 'POST',
+                body: JSON.stringify({ name, email, password, mobile, cnic,
+                    profile_pic: profilePicBase64, cnic_pic: cnicPicBase64 })
+            });
+            pendingEmail = email;
+            document.getElementById('verifyEmail').innerText = email;
+            showModal();
+            document.getElementById('registerForm').reset();
+            document.getElementById('profilePreview').innerHTML = '';
+            document.getElementById('cnicPreview').innerHTML = '';
+        } catch (err) {
+            errorDiv.innerText = err.detail || err.message || 'Registration failed.';
+        }
+    });
+
+    // PIN entry
+    const pinDigits = document.querySelectorAll('.pin-digit');
+    pinDigits.forEach((input, idx) => {
+        input.addEventListener('input', (e) => {
+            if (e.target.value.length === 1 && idx < pinDigits.length-1) pinDigits[idx+1].focus();
+        });
+    });
+
+    async function verifyPin() {
+        const pin = Array.from(pinDigits).map(i => i.value).join('');
+        if (pin.length !== 6) { document.getElementById('verifyError').innerText = 'Enter 6-digit PIN.'; return; }
+        try {
+            await apiRequest('/auth/verify-email', { method: 'POST', body: JSON.stringify({ email: pendingEmail, pin }) });
+            document.getElementById('verifySuccess').innerText = '✅ Email verified! Redirecting to login...';
+            setTimeout(() => { window.location.href = '/login'; }, 2000);
+        } catch (err) {
+            document.getElementById('verifyError').innerText = err.detail || err.message || 'Invalid PIN.';
+        }
+    }
+    document.getElementById('verifyPinBtn').addEventListener('click', verifyPin);
+
+    document.getElementById('resendPinBtn').addEventListener('click', async () => {
+        try {
+            await apiRequest('/auth/resend-pin', { method: 'POST', body: JSON.stringify({ email: pendingEmail }) });
+            document.getElementById('verifyError').innerText = '';
+            document.getElementById('verifySuccess').innerText = 'New PIN sent to your email.';
+        } catch (err) {
+            document.getElementById('verifyError').innerText = err.detail || err.message || 'Failed to resend PIN.';
+        }
+    });
+
+    // Login with unverified email handling
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const errorDiv = document.getElementById('loginError');
+        errorDiv.innerText = '';
+        if (!email || !password) { errorDiv.innerText = 'Email and password required.'; return; }
+        try {
+            const data = await apiRequest('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+            localStorage.setItem('access_token', data.access_token);
+            localStorage.setItem('refresh_token', data.refresh_token);
+            window.location.href = '/';
+        } catch (err) {
+            const errorMsg = err.detail || err.message || '';
+            if (errorMsg.toLowerCase().includes('email not verified')) {
+                pendingEmail = email;
+                document.getElementById('verifyEmail').innerText = email;
+                showModal();
+                errorDiv.innerText = ''; // clear error, user will verify
+            } else {
+                errorDiv.innerText = errorMsg || 'Login failed.';
+            }
+        }
+    });
+</script>
+</body>
+</html>

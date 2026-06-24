@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Al-Quran - Read & Explore</title>
+    <link rel="stylesheet" href="/static/css/new_styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Noto+Nastaliq+Urdu&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="logo">📖 القرآن الكريم</h1>
+            <nav><a href="/">← Back to Home</a></nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="surah-list">
+            <h2>Surah List</h2>
+            <div id="surahs-container" class="surah-grid"></div>
+        </div>
+
+        <div id="ayah-view" style="display:none;">
+            <button id="backToSurahs" style="margin-bottom:1rem;">← Back to Surahs</button>
+            <h2 id="surah-title"></h2>
+            <div id="ayahs-container" class="ayah-list"></div>
+            <div class="pagination" id="ayah-pagination"></div>
+        </div>
+    </main>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script>
+        let currentSurah = null;
+        let currentPage = 1;
+        const pageSize = 20;
+
+        async function loadSurahs() {
+            const data = await apiRequest('/quran/surahs?page=1&page_size=114');
+            const container = document.getElementById('surahs-container');
+            container.innerHTML = data.items.map(s => `
+                <div class="surah-card" data-surah="${s.surah_number}">
+                    <div class="surah-num">${s.surah_number}</div>
+                    <div class="surah-name-ar">${s.arabic_name}</div>
+                    <div class="surah-name-ur">${s.urdu_name}</div>
+                    <div class="surah-name-en">${s.english_name}</div>
+                    <div class="surah-ayat">${s.total_ayat} Ayahs</div>
+                </div>
+            `).join('');
+             
+            document.querySelectorAll('.surah-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const surahNum = parseInt(card.dataset.surah);
+                    // Redirect to first ayah of this surah
+                    window.location.href = `/ayah/${surahNum}/1`;
+                });
+            });
+        }
+
+        async function loadAyahs(surahNum, page = 1) {
+            currentSurah = surahNum;
+            currentPage = page;
+            const data = await apiRequest(`/quran/surah/${surahNum}/ayahs?page=${page}&page_size=${pageSize}`);
+            const surahInfo = await apiRequest(`/quran/surah/${surahNum}`);
+            document.getElementById('surah-title').innerHTML = `${surahInfo.arabic_name} (${surahInfo.english_name})`;
+            const container = document.getElementById('ayahs-container');
+            if(data.items.length === 0) {
+                container.innerHTML = '<p style="text-align:center;">No ayahs found. Please import Quran data.</p>';
+            } else {
+                container.innerHTML = data.items.map(ayah => `
+                    <div class="ayah-card" id="ayah-${ayah.ayah_number}">
+                        <div class="ayah-header">Ayah ${ayah.ayah_number}</div>
+                        <div class="arabic-text">${ayah.arabic_text}</div>
+                        <div class="translations">
+                            <div class="urdu">${ayah.translations.ur || ''}</div>
+                            <div class="english">${ayah.translations.en || ''}</div>
+                        </div>
+                        <div class="ayah-meta">
+                            <span>Juz: ${ayah.juz_number}</span> | 
+                            <span>Hizb: ${ayah.hizb_number}</span> | 
+                            <span>Abjad: ${ayah.total_abjad}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            document.querySelector('.surah-list').style.display = 'none';
+            document.getElementById('ayah-view').style.display = 'block';
+            renderPagination(data.total_pages, page);
+        }
+
+        function renderPagination(totalPages, current) {
+            const container = document.getElementById('ayah-pagination');
+            let html = '';
+            for(let i=1; i<=totalPages; i++) {
+                html += `<button class="page-btn ${i===current?'active':''}" data-page="${i}">${i}</button>`;
+            }
+            container.innerHTML = html;
+            document.querySelectorAll('.page-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const newPage = parseInt(btn.dataset.page);
+                    loadAyahs(currentSurah, newPage);
+                });
+            });
+        }
+
+        document.getElementById('backToSurahs')?.addEventListener('click', () => {
+            document.getElementById('ayah-view').style.display = 'none';
+            document.querySelector('.surah-list').style.display = 'block';
+        });
+
+        loadSurahs();
+    </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head><title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/static/css/new_styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ Admin Panel</h1>
+        <div id="adminSection">
+            <h2>⬆️ Upload Ayah</h2>
+            <form id="uploadForm" style="background:#fef9ef; padding:1.5rem; border-radius:30px;">
+                <input name="surah" placeholder="Surah Number" required>
+                <input name="ayah_number" placeholder="Ayah Number" required>
+                <textarea name="arabic_text" placeholder="Arabic text" rows="3" required></textarea>
+                <input name="waqf" placeholder="Waqf symbol (optional)">
+                <label><input type="checkbox" name="sajdah"> Sajdah</label>
+                <label><input type="checkbox" name="rukuEnd"> Ruku End</label>
+                <button type="submit">Upload Ayah</button>
+            </form>
+            <hr>
+            <h2>⏳ Pending Notes</h2>
+            <div id="pendingNotes"></div>
+        </div>
+    </div>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script>
+        const token = localStorage.getItem('access_token');
+        if (!token) window.location.href = '/login';
+
+        async function loadPendingNotes() {
+            try {
+                const notes = await apiRequest('/admin/notes/pending');
+                document.getElementById('pendingNotes').innerHTML = notes.map(n => `
+                    <div>${n.content}<div><button onclick="verifyNote('${n.note_id}', 'verified')">✅ Verify</button><button onclick="verifyNote('${n.note_id}', 'rejected')">❌ Reject</button></div></div>
+                `).join('');
+            } catch(e) { console.error(e); }
+        }
+        window.verifyNote = async (id, status) => {
+            await apiRequest(`/admin/notes/verify/${id}`, { method: 'POST', body: JSON.stringify({ status }) });
+            loadPendingNotes();
+        };
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = {
+                surah: parseInt(formData.get('surah')),
+                ayah_number: parseInt(formData.get('ayah_number')),
+                arabic_text: formData.get('arabic_text'),
+                waqf: formData.get('waqf') || null,
+                sajdah: formData.has('sajdah'),
+                rukuEnd: formData.has('rukuEnd')
+            };
+            await apiRequest('/admin/ayah/upload', { method: 'POST', body: JSON.stringify(data) });
+            alert('Ayah uploaded');
+            e.target.reset();
+        });
+        loadPendingNotes();
+    </script>
+</body>
+</html>

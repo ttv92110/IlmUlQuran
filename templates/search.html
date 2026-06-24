@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Search | Ilm Ul Quran</title>
+    <link rel="stylesheet" href="/static/css/new_styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Noto+Nastaliq+Urdu&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #fef9e6 0%, #f5ebd2 100%);
+        }
+        .search-container {
+            background: white;
+            border-radius: 40px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+        .search-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        .search-group {
+            flex: 1;
+            min-width: 180px;
+        }
+        .search-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1e6b5e;
+            margin-bottom: 0.3rem;
+        }
+        .search-group select, .search-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #e0d5c0;
+            border-radius: 30px;
+            font-size: 1rem;
+            background: white;
+            transition: 0.2s;
+        }
+        .search-group select:focus, .search-group input:focus {
+            border-color: #c9a34b;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(201,163,75,0.2);
+        }
+        #languageSelector {
+            display: none;
+            flex: 1;
+            min-width: 180px;
+        }
+        .search-btn {
+            background: linear-gradient(135deg, #0b3b2f, #1e6b5e);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+        .search-btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #1e6b5e, #2a8a7a);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+        }
+        .result-card {
+            background: white;
+            border-radius: 28px;
+            padding: 1.5rem;
+            margin-bottom: 1.2rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 1px solid #f0e6d5;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .result-card:hover {
+            transform: translateY(-3px);
+            border-color: #c9a34b;
+            box-shadow: 0 12px 20px -10px rgba(0,0,0,0.15);
+            background: #fffdf9;
+        }
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid #f0e6d5;
+            padding-bottom: 0.5rem;
+        }
+        .result-surah {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #c9a34b;
+            letter-spacing: 0.5px;
+        }
+        .result-abjad {
+            background: #eef2e5;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1e6b5e;
+        }
+        .result-arabic {
+            font-size: 1.4rem;
+            font-family: 'Amiri', serif;
+            line-height: 1.6;
+            direction: rtl;
+            text-align: right;
+            margin: 0.8rem 0;
+        }
+        .result-translation {
+            font-family: 'Noto Nastaliq Urdu', serif;
+            font-size: 1rem;
+            background: #f9f6ed;
+            padding: 0.8rem;
+            border-radius: 20px;
+            margin-top: 0.5rem;
+        }
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 30px;
+            color: #6b6b6b;
+        }
+        @media (max-width: 768px) {
+            .search-options {
+                flex-direction: column;
+            }
+            .search-group, #languageSelector {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="logo">📖 Ilm Ul Quran</h1>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/quran">Quran</a>
+                <a href="/abjad">Abjad</a>
+                <!-- <a href="/notes">Notes</a> -->
+                <a href="/search" class="active">Search</a>
+                <div id="auth-buttons"></div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="search-container">
+            <div class="search-options">
+                <div class="search-group">
+                    <label>🔎 Search Type</label>
+                    <select id="searchType">
+                        <option value="word">Arabic Word</option>
+                        <option value="root">Root Word</option>
+                        <option value="abjad">Abjad Value</option>
+                        <option value="fulltext">Full Text (Translations)</option>
+                    </select>
+                </div>
+                <div class="search-group">
+                    <label>🔤 Search Term</label>
+                    <input type="text" id="searchQuery" placeholder="e.g., رحمن, 786, رحم">
+                </div>
+                <div id="languageSelector" class="search-group">
+                    <label>🌐 Language</label>
+                    <select id="searchLang">
+                        <option value="arabic">Arabic Text</option>
+                        <option value="ur">Urdu Translation</option>
+                        <option value="en">English Translation</option>
+                        <option value="hi">Hindi Translation</option>
+                        <option value="tr">Turkish Translation</option>
+                        <option value="id">Indonesian Translation</option>
+                        <option value="fa">Persian Translation</option>
+                    </select>
+                </div>
+                <button id="searchBtn" class="search-btn">Search Now</button>
+            </div>
+        </div>
+
+        <div id="results" class="results-container"></div>
+    </main>
+
+    <footer>
+        <p>© 2025 Ilm Ul Quran — Open source knowledge platform</p>
+    </footer>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script>
+        const searchTypeSelect = document.getElementById('searchType');
+        const langSelectorDiv = document.getElementById('languageSelector');
+        const searchBtn = document.getElementById('searchBtn');
+        const searchQuery = document.getElementById('searchQuery');
+        const resultsDiv = document.getElementById('results');
+
+        // Toggle language selector
+        searchTypeSelect.addEventListener('change', () => {
+            if (searchTypeSelect.value === 'fulltext') {
+                langSelectorDiv.style.display = 'block';
+            } else {
+                langSelectorDiv.style.display = 'none';
+            }
+        });
+
+        searchBtn.addEventListener('click', async () => {
+            const type = searchTypeSelect.value;
+            let query = searchQuery.value.trim();
+            if (!query) {
+                resultsDiv.innerHTML = '<div class="no-results">⚠️ Please enter a search term.</div>';
+                return;
+            }
+
+            resultsDiv.innerHTML = '<div style="text-align:center; padding:2rem;">⏳ Searching...</div>';
+            let url = '';
+
+            try {
+                if (type === 'word') {
+                    url = `/search/word?q=${encodeURIComponent(query)}`;
+                } 
+                else if (type === 'root') {
+                    url = `/search/root?root=${encodeURIComponent(query)}`;
+                } 
+                else if (type === 'abjad') {
+                    const num = parseInt(query);
+                    if (isNaN(num)) {
+                        resultsDiv.innerHTML = '<div class="no-results">❌ Please enter a valid number for Abjad value.</div>';
+                        return;
+                    }
+                    url = `/search/abjad?value=${num}`;
+                } 
+                else if (type === 'fulltext') {
+                    const lang = document.getElementById('searchLang').value;
+                    url = `/search/fulltext?q=${encodeURIComponent(query)}&language=${lang}`;
+                }
+
+                const results = await apiRequest(url);
+                if (!results || results.length === 0) {
+                    resultsDiv.innerHTML = '<div class="no-results">😔 No results found. Try a different keyword.</div>';
+                    return;
+                }
+
+                // Render clickable result cards
+                resultsDiv.innerHTML = results.map(ayah => `
+                    <div class="result-card" data-surah="${ayah.surah_number}" data-ayah="${ayah.ayah_number}">
+                        <div class="result-header">
+                            <span class="result-surah">📖 Surah ${ayah.surah_number}:${ayah.ayah_number}</span>
+                            <span class="result-abjad">🔢 Abjad: ${ayah.total_abjad}</span>
+                        </div>
+                        <div class="result-arabic">${ayah.arabic_text}</div>
+                        <div class="result-translation">${ayah.translations.ur || ayah.translations.en || 'Translation not available'}</div>
+                    </div>
+                `).join('');
+
+                // Add click handlers to each result card
+                document.querySelectorAll('.result-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const surah = card.getAttribute('data-surah');
+                        const ayah = card.getAttribute('data-ayah');
+                        window.location.href = `/ayah/${surah}/${ayah}`;
+                    });
+                });
+            } catch (err) {
+                resultsDiv.innerHTML = `<div class="no-results">⚠️ Search failed: ${err.message}</div>`;
+            }
+        });
+
+        // Trigger initial state
+        searchTypeSelect.dispatchEvent(new Event('change'));
+    </script>
+</body>
+</html>
