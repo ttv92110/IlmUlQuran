@@ -156,7 +156,7 @@ api/scripts/
 data/Translate/
 
 # Generated JSON files
-data/ruku.json
+# data/ruku.json
 data/unique_phrases.json
 data/quran_word_by_word_en.json
 
