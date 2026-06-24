@@ -221,7 +221,7 @@ class Statistics(BaseModel):
 class Surah(BaseModel):
     surah_number: int = Field(..., ge=1, le=114)
     arabic_name: str
-    urdu_name: str
+    urdu_name: Optional[str] = "" 
     english_name: str
     meaning: str
     makki_madani: str

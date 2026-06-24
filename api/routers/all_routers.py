@@ -366,8 +366,8 @@ async def get_enriched_ayah(
             "arabic": w.arabic_word,
             "transliteration": w.transliteration or "",
             "translation": w.translations.get(lang, w.translations.get("ur", "")),
-            "urdu_meaning": w.urdu_meaning or "",
-            "english_meaning": w.english_meaning or "",
+            "urdu_meaning": w.translations.get("ur", ""),      # FIXED
+            "english_meaning": w.translations.get("en", ""),   # FIXED
             "abjad": w.abjad_value,
             "letter_count": w.letter_count,
             "occurrence_in_surah": occ_in_surah,

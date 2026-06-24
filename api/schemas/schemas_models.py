@@ -174,7 +174,7 @@ class NoteVerifyRequest(BaseModel):
 class SurahResponse(BaseModel):
     surah_number: int
     arabic_name: str
-    urdu_name: str
+    urdu_name: Optional[str] = ""   # was: urdu_name: str
     english_name: str
     meaning: str
     makki_madani: str

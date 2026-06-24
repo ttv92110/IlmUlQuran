@@ -44,12 +44,31 @@ class BaseSheetsRepository:
             return None
         cleaned = {}
         column_mapping = {'position': 'position_in_ayah'}
+        
+        # Define string fields that should become empty string if None
+        string_fields = {
+            'mobile', 'cnic', 'verification_pin', 'user_id', 'name', 'email',
+            'role', 'hashed_password', 'profile_pic', 'cnic_pic',
+            'root_word', 'root_meaning', 'arabic_word', 'urdu_meaning',
+            'english_meaning', 'transliteration', 'word_text', 'occurrence_id',
+            'urdu_name', 'arabic_name', 'english_name', 'meaning', 'makki_madani',
+            'arabic_without_harakat', 'arabic_normalized', 'normalized_letters'
+        }
+
         for k, v in data.items():
             mapped_key = column_mapping.get(k, k)
-            if v == 'None':
-                cleaned[mapped_key] = None
+
+            # ---------- Handle None ----------
+            if v is None:
+                if mapped_key in string_fields:
+                    cleaned[mapped_key] = ""
+                elif mapped_key in DATETIME_FIELDS:
+                    cleaned[mapped_key] = None
+                else:
+                    cleaned[mapped_key] = None
                 continue
 
+            # ---------- Handle empty string for numeric fields ----------
             if isinstance(v, str) and v.strip() == '':
                 if mapped_key in ('position_in_ayah', 'surah_number', 'ayah_number',
                                 'global_ayah_number', 'abjad_value', 'letter_count',
@@ -63,14 +82,16 @@ class BaseSheetsRepository:
                     cleaned[mapped_key] = None
                 continue
 
+            # ---------- Role conversion ----------
             if mapped_key == 'role' and isinstance(v, str):
                 if v.startswith('UserRole.'):
                     v = v.split('.')[-1].lower()
                 else:
                     v = v.lower()
 
+            # ---------- JSON fields ----------
             if mapped_key in ('juz_info', 'manzil_info', 'hizb_info', 'word_abjad_list',
-                              'letter_frequency', 'translations', 'waqf_marks', 'letter_counts'):
+                            'letter_frequency', 'translations', 'waqf_marks', 'letter_counts'):
                 if isinstance(v, int):
                     cleaned[mapped_key] = [v]
                 elif isinstance(v, str) and (v.startswith('[') or v.startswith('{')):
@@ -83,6 +104,7 @@ class BaseSheetsRepository:
                 else:
                     cleaned[mapped_key] = [] if mapped_key in ('juz_info', 'manzil_info', 'hizb_info', 'word_abjad_list') else {}
             else:
+                # Try to parse JSON for any string that looks like array/object
                 if isinstance(v, str) and (v.startswith('[') or v.startswith('{')):
                     try:
                         cleaned[mapped_key] = json.loads(v)
@@ -90,14 +112,8 @@ class BaseSheetsRepository:
                         cleaned[mapped_key] = v
                 else:
                     cleaned[mapped_key] = v
-        
-        string_fields = {
-                        'mobile', 'cnic', 'verification_pin', 'user_id', 'name', 'email',
-                        'role', 'hashed_password', 'profile_pic', 'cnic_pic',
-                        # Add these fields:
-                        'root_word', 'root_meaning', 'arabic_word', 'urdu_meaning',
-                        'english_meaning', 'transliteration', 'word_text', 'occurrence_id'
-                    }
+
+        # ---------- Convert integers to strings for string fields ----------
         for field in string_fields:
             if field in cleaned and isinstance(cleaned[field], int):
                 cleaned[field] = str(cleaned[field])
