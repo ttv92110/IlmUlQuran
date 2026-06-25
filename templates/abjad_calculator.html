@@ -41,60 +41,96 @@
 <script>
   (function() {
     async function loadMappings() {
-      const mappings = await apiRequest('/abjad/mappings');
-      const container = document.getElementById('mappings');
-      container.innerHTML = mappings.map(m => `
-        <div class="mapping-item" data-letter="${m.letter}" style="background:#fff; padding:0.5rem; border-radius:12px; text-align:center; cursor:pointer; transition:0.2s; border:1px solid #ddd;">
-          <strong>${m.letter}</strong> = ${m.abjad_value}
-        </div>
-      `).join('');
+      try {
+        const mappings = await apiRequest('/abjad/mappings');
+        const container = document.getElementById('mappings');
+        container.innerHTML = mappings.map(m => `
+          <div class="mapping-item" data-letter="${m.letter}" style="background:#fff; padding:0.5rem; border-radius:12px; text-align:center; cursor:pointer; transition:0.2s; border:1px solid #ddd;">
+            <strong>${m.letter}</strong> = ${m.abjad_value}
+          </div>
+        `).join('');
 
-      document.querySelectorAll('.mapping-item').forEach(item => {
-        item.addEventListener('click', () => {
-          const letter = item.getAttribute('data-letter');
-          const input = document.getElementById('wordInput');
-          input.value += letter;
-          input.focus();
+        document.querySelectorAll('.mapping-item').forEach(item => {
+          item.addEventListener('click', () => {
+            const letter = item.getAttribute('data-letter');
+            const input = document.getElementById('wordInput');
+            input.value += letter;
+            input.focus();
+          });
+          item.addEventListener('mouseenter', () => {
+            item.style.backgroundColor = '#c9a34b';
+            item.style.color = 'white';
+          });
+          item.addEventListener('mouseleave', () => {
+            item.style.backgroundColor = '#fff';
+            item.style.color = '';
+          });
         });
-        item.addEventListener('mouseenter', () => {
-          item.style.backgroundColor = '#c9a34b';
-          item.style.color = 'white';
-        });
-        item.addEventListener('mouseleave', () => {
-          item.style.backgroundColor = '#fff';
-          item.style.color = '';
-        });
-      });
+      } catch (err) {
+        console.error('Failed to load mappings:', err);
+      }
     }
     loadMappings();
 
     document.getElementById('calculateBtn').addEventListener('click', async () => {
-        const btn = document.getElementById('calculateBtn');
-        const word = document.getElementById('wordInput').value.trim();
-        if (!word) {
-            alert('Please enter a word or phrase.');
-            return;
-        }
-
-        // Button loading state
-        setButtonLoading(btn, true);
-
-      let abjadValue;
-      try {
-            const data = await apiRequest(`/abjad/word/${encodeURIComponent(word)}`);
-            const abjadValue = data.abjad_value;
-            document.getElementById('result').innerHTML = `Abjad Value: <span style="color:#1e6b5e;">${abjadValue}</span>`;
-      }  catch(err) {
-            document.getElementById('result').innerHTML = `Error: ${err.message}`;
-        } finally {
-            setButtonLoading(btn, false);
-        }
-
-      // Matching Ayahs
+      const btn = document.getElementById('calculateBtn');
+      const word = document.getElementById('wordInput').value.trim();
+      const resultDiv = document.getElementById('result');
       const ayahContainer = document.getElementById('matchingAyahs');
-      const ayahList = document.getElementById('ayahList');
-      ayahList.innerHTML = '';
+      const wordContainer = document.getElementById('matchingWords');
+      const globalContainer = document.getElementById('matchingGlobal');
+
+      // Reset previous results
+      resultDiv.innerHTML = '';
+      ayahContainer.style.display = 'none';
+      wordContainer.style.display = 'none';
+      globalContainer.style.display = 'none';
+
+      if (!word) {
+        alert('Please enter a word or phrase.');
+        return;
+      }
+
+      // Button loading state
+      setButtonLoading(btn, true);
+
+      let abjadValue = null;
+
       try {
+        // 1. Calculate Abjad value
+        const data = await apiRequest(`/abjad/word/${encodeURIComponent(word)}`);
+        console.log('Abjad API response:', data); // For debugging
+
+        // Safely extract abjad_value
+        if (data && typeof data.abjad_value === 'number') {
+          abjadValue = data.abjad_value;
+        } else if (data && data.value) {
+          // Fallback if API uses different key
+          abjadValue = data.value;
+        } else {
+          throw new Error('Invalid response from Abjad API');
+        }
+
+        resultDiv.innerHTML = `Abjad Value: <span style="color:#1e6b5e;">${abjadValue}</span>`;
+
+      } catch (err) {
+        resultDiv.innerHTML = `Error: ${err.message}`;
+        setButtonLoading(btn, false);
+        return;
+      }
+
+      // If abjadValue is still null/undefined, show error
+      if (abjadValue === null || abjadValue === undefined || isNaN(abjadValue)) {
+        resultDiv.innerHTML = 'Error: Could not calculate Abjad value.';
+        setButtonLoading(btn, false);
+        return;
+      }
+
+      // Now proceed with search calls using abjadValue
+      try {
+        // 2. Search matching Ayahs
+        const ayahList = document.getElementById('ayahList');
+        ayahList.innerHTML = '';
         const ayahs = await apiRequest(`/search/abjad?value=${abjadValue}`);
         if (ayahs && ayahs.length > 0) {
           ayahContainer.style.display = 'block';
@@ -118,15 +154,15 @@
         } else {
           ayahContainer.style.display = 'none';
         }
-      } catch(err) {
+      } catch (err) {
+        console.warn('No matching ayahs found:', err);
         ayahContainer.style.display = 'none';
       }
 
-      // Matching Words
-      const wordContainer = document.getElementById('matchingWords');
-      const wordList = document.getElementById('wordList');
-      wordList.innerHTML = '';
       try {
+        // 3. Search matching Words
+        const wordList = document.getElementById('wordList');
+        wordList.innerHTML = '';
         const wordsData = await apiRequest(`/search/abjad/words?value=${abjadValue}`);
         if (wordsData && wordsData.length > 0) {
           wordContainer.style.display = 'block';
@@ -156,14 +192,14 @@
         } else {
           wordContainer.style.display = 'none';
         }
-      } catch(err) {
+      } catch (err) {
+        console.warn('No matching words found:', err);
         wordContainer.style.display = 'none';
       }
 
-      // Global Ayah match
-      const globalContainer = document.getElementById('matchingGlobal');
-      const globalLink = document.getElementById('globalAyahLink');
       try {
+        // 4. Check global ayah match
+        const globalLink = document.getElementById('globalAyahLink');
         const ayah = await apiRequest(`/quran/ayah/global/${abjadValue}`);
         if (ayah && ayah.global_ayah_number === abjadValue) {
           globalContainer.style.display = 'block';
@@ -171,10 +207,14 @@
         } else {
           globalContainer.style.display = 'none';
         }
-      } catch(err) {
+      } catch (err) {
+        console.warn('No global ayah match:', err);
         globalContainer.style.display = 'none';
       }
+
+      setButtonLoading(btn, false);
     });
+
   })();
 </script>
 {% endblock %}
