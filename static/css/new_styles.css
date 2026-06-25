@@ -491,3 +491,185 @@ footer {
     width: 80%;
   }
 }
+
+/* ----------------------------------------------------------- */
+
+/* Password toggle */
+.password-group {
+  position: relative;
+}
+.toggle-password {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-10%);
+  cursor: pointer;
+  font-size: 1.2rem;
+  user-select: none;
+}
+.password-group input {
+  padding-right: 2.5rem;
+}
+
+/* Auth card (login/register) */
+.auth-card {
+  max-width: 500px;
+  margin: 2rem auto;
+  background: white;
+  border-radius: 40px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+.tabs {
+  display: flex;
+  border-bottom: 1px solid #e0d5c0;
+}
+.tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 1.2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  color: #6b6b6b;
+}
+.tab-btn.active {
+  color: #1e6b5e;
+  border-bottom: 3px solid #c9a34b;
+}
+.tab-pane {
+  display: none;
+  padding: 2rem;
+}
+.tab-pane.active {
+  display: block;
+}
+.form-group {
+  margin-bottom: 1.2rem;
+}
+.form-group label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+  color: #2c2b28;
+}
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid #e0d5c0;
+  border-radius: 30px;
+  font-size: 1rem;
+  transition: 0.2s;
+}
+.form-group input:focus {
+  border-color: #c9a34b;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(201,163,75,0.2);
+}
+.btn-primary {
+  width: 100%;
+  background: linear-gradient(135deg, #0b3b2f, #1e6b5e);
+  color: white;
+  border: none;
+  padding: 0.9rem;
+  border-radius: 40px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 0.5rem;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #1e6b5e, #2a8a7a);
+}
+.switch-text {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+.switch-text a {
+  color: #c9a34b;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+.error-message {
+  color: #c0392b;
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+}
+.success-message {
+  color: #27ae60;
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+}
+.image-preview {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+.image-preview img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid #c9a34b;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0.2s, opacity 0.2s;
+}
+.modal-overlay.active {
+  visibility: visible;
+  opacity: 1;
+}
+.modal-content {
+  background: white;
+  border-radius: 40px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+.pin-input {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+.pin-input input {
+  width: 50px;
+  text-align: center;
+  font-size: 1.5rem;
+  padding: 0.5rem;
+  border: 1px solid #e0d5c0;
+  border-radius: 12px;
+}
+.modal-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+.btn-secondary {
+  background: #e0d5c0;
+  color: #2c2b28;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 30px;
+  cursor: pointer;
+}

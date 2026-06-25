@@ -37,13 +37,9 @@
 </div>
 {% endblock %}
 
-
-    <script src="/static/js/api.js"></script>
-    <script src="/static/js/auth.js"></script>
+{% block extra_js %}
 <script>
-    
   (function() {
-    // --- حروف کی میپنگ لوڈ کریں ---
     async function loadMappings() {
       const mappings = await apiRequest('/abjad/mappings');
       const container = document.getElementById('mappings');
@@ -72,7 +68,6 @@
     }
     loadMappings();
 
-    // --- حساب اور نتائج ---
     document.getElementById('calculateBtn').addEventListener('click', async () => {
       const word = document.getElementById('wordInput').value.trim();
       if (!word) {
@@ -80,7 +75,6 @@
         return;
       }
 
-      // 1. ابجد ویلیو حاصل کریں
       let abjadValue;
       try {
         const data = await apiRequest(`/abjad/word/${encodeURIComponent(word)}`);
@@ -91,7 +85,7 @@
         return;
       }
 
-      // 2. اس ویلیو کے ساتھ آیات تلاش کریں (سرچ انجن سے)
+      // Matching Ayahs
       const ayahContainer = document.getElementById('matchingAyahs');
       const ayahList = document.getElementById('ayahList');
       ayahList.innerHTML = '';
@@ -121,10 +115,9 @@
         }
       } catch(err) {
         ayahContainer.style.display = 'none';
-        console.warn('No matching ayahs found');
       }
 
-      // 3. اس ویلیو کے ساتھ الفاظ تلاش کریں
+      // Matching Words
       const wordContainer = document.getElementById('matchingWords');
       const wordList = document.getElementById('wordList');
       wordList.innerHTML = '';
@@ -138,7 +131,6 @@
             const div = document.createElement('div');
             div.className = 'result-card';
             div.style.cursor = 'pointer';
-            // ہائی لائٹ کی گئی لفظ (سرخ رنگ)
             const highlightedText = ayah.arabic_text.replace(
               new RegExp(word.arabic_word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
               `<span style="background-color:#ffd966; color:#c0392b; font-weight:bold;">${word.arabic_word}</span>`
@@ -152,7 +144,6 @@
               <div style="font-size:0.8rem; color:#6b6b6b;">Click to view full Ayah</div>
             `;
             div.addEventListener('click', () => {
-              // ہم اس لفظ کو ہائی لائٹ کرنے کے لیے ayah_detail صفحہ پر ?highlight=word بھیج سکتے ہیں، لیکن اس کے لیے اضافی کام ہوگا۔ اس لیے صرف آیت پر لے جائیں۔
               window.location.href = `/ayah/${word.surah_number}/${word.ayah_number}`;
             });
             wordList.appendChild(div);
@@ -162,14 +153,12 @@
         }
       } catch(err) {
         wordContainer.style.display = 'none';
-        console.warn('No matching words found');
       }
 
-      // 4. چیک کریں کہ آیا کوئی آیت کا گلوبل نمبر اس ویلیو کے برابر ہے
+      // Global Ayah match
       const globalContainer = document.getElementById('matchingGlobal');
       const globalLink = document.getElementById('globalAyahLink');
       try {
-        // ہم عالمی آیت نمبر کی تلاش کے لیے ایک علیحدہ API استعمال کر سکتے ہیں، لیکن یہاں ہم فرض کرتے ہیں کہ /quran/ayah/global/{num} موجود ہے۔
         const ayah = await apiRequest(`/quran/ayah/global/${abjadValue}`);
         if (ayah && ayah.global_ayah_number === abjadValue) {
           globalContainer.style.display = 'block';
@@ -181,10 +170,6 @@
         globalContainer.style.display = 'none';
       }
     });
-
   })();
 </script>
-
-{% block extra_js %}
- 
 {% endblock %}

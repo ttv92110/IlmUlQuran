@@ -303,6 +303,7 @@ class User(BaseModel):
                 "name": "Arshad Ali",
                 "email": "ttv92110@gmail.com",
                 "role": "admin",
+                "language":  'ur',
                 "is_active": True
             }
         }

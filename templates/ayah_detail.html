@@ -21,7 +21,6 @@
 <div id="loading" style="text-align:center; padding:2rem;">Loading...</div>
 
 <div id="ayahContent" style="display:none;">
-  <!-- باقی سب وہی جو پہلے تھا -->
   <div class="lang-selector">
     <label for="langSelect">🌐 Translation:</label>
     <select id="langSelect">
@@ -48,7 +47,17 @@
   <div class="dashboard">
     <div class="stats-panel">
       <h3>📊 Ayah Statistics</h3>
-      <!-- ... تمام stats ... -->
+      <div class="stat-row"><span class="stat-label">Total Abjad:</span><span class="stat-value" id="totalAbjad"></span></div>
+      <div class="stat-row"><span class="stat-label">Total Letters:</span><span class="stat-value" id="totalLetters"></span></div>
+      <div class="stat-row"><span class="stat-label">Total Symbols:</span><span class="stat-value" id="totalSymbols"></span></div>
+      <div class="stat-row"><span class="stat-label">Total Words:</span><span class="stat-value" id="totalWords"></span></div>
+      <div class="stat-row"><span class="stat-label">Unique Words:</span><span class="stat-value" id="uniqueWords"></span></div>
+      <div class="stat-row"><span class="stat-label">Manzil:</span><span class="stat-value" id="manzil"></span></div>
+      <div class="stat-row"><span class="stat-label">Ruku:</span><span class="stat-value" id="ruku"></span> (Pos: <span id="rukuPos"></span>)</div>
+      <div class="stat-row"><span class="stat-label">Ruku End:</span><span class="stat-value" id="rukuEnd"></span></div>
+      <div class="stat-row"><span class="stat-label">Juz:</span><span class="stat-value" id="juz"></span></div>
+      <div class="stat-row"><span class="stat-label">Hizb:</span><span class="stat-value" id="hizb"></span></div>
+      <div class="stat-row"><span class="stat-label">Sajdah:</span><span class="stat-value" id="sajdah"></span></div>
     </div>
     <div class="freq-panel">
       <h3>🔤 Letter Frequency</h3>
@@ -61,292 +70,292 @@
   <div class="notes-section" id="notesSection">
     <h3>📝 Community Notes</h3>
     <div id="notesList"></div>
-    <div id="addNoteForm" style="display: none;">...</div>
-    <div id="loginToNote" style="display: none;">...</div>
+    <div id="addNoteForm" style="display: none;">
+      <div class="add-note-form">
+        <h4>Add Your Note</h4>
+        <select id="noteType">
+          <option value="tafsir">Tafsir</option>
+          <option value="linguistic">Linguistic</option>
+          <option value="abjad">Abjad</option>
+          <option value="historical">Historical</option>
+          <option value="research">Research</option>
+          <option value="general">General</option>
+        </select>
+        <input type="text" id="noteTitle" placeholder="Title (optional)">
+        <textarea id="noteContent" rows="3" placeholder="Write your note here..."></textarea>
+        <button id="submitNoteBtn" class="btn btn-small">Submit Note</button>
+      </div>
+    </div>
+    <div id="loginToNote" style="display: none;">🔒 Please <a href="/login">login</a> to contribute notes.</div>
   </div>
 </div>
-
-    <footer>
-        <p>© 2025 Ilm Ul Quran — Open source knowledge platform</p>
-    </footer>
-
 {% endblock %}
 
-
-
-    <script src="/static/js/api.js"></script>
-    <script src="/static/js/auth.js"></script>
-    <script>
-        let currentSurah = null;
-        let currentAyah = null;
-        let currentGlobal = null;
-        let navInfo = null;
-        let currentUser = null;
-
-        const pathParts = window.location.pathname.split('/');
-        if (pathParts.length >= 4 && pathParts[1] === 'ayah') {
-            currentSurah = parseInt(pathParts[2]);
-            currentAyah = parseInt(pathParts[3]);
-        }
-
-        // Load user info
-        async function loadUser() {
-            currentUser = await getCurrentUser();
-            updateNoteFormVisibility();
-        }
-
-        function updateNoteFormVisibility() {
-            const addNoteDiv = document.getElementById('addNoteForm');
-            const loginPrompt = document.getElementById('loginToNote');
-            if (currentUser) {
-                addNoteDiv.style.display = 'block';
-                loginPrompt.style.display = 'none';
-            } else {
-                addNoteDiv.style.display = 'none';
-                loginPrompt.style.display = 'block';
-            }
-        }
-
-        async function loadNotes(globalAyahId) {
-            const notesContainer = document.getElementById('notesList');
-            if (!globalAyahId) return;
-            notesContainer.innerHTML = '<p>Loading notes...</p>';
-            try {
-                const notes = await apiRequest(`/notes/ayah/${globalAyahId}`);
-                if (!notes || notes.length === 0) {
-                    notesContainer.innerHTML = '<p>No community notes yet. Be the first to add one!</p>';
-                    return;
-                }
-                let html = '';
-                for (const note of notes) {
-                    let statusClass = '';
-                    if (note.status === 'pending') statusClass = 'status-pending';
-                    else if (note.status === 'verified') statusClass = 'status-verified';
-                    else if (note.status === 'rejected') statusClass = 'status-rejected';
-                    html += `
-                        <div class="note-card" data-note-id="${note.note_id}">
-                            <div class="note-header">
-                                <span><strong>${note.note_type}</strong> by ${note.user_id.substring(0,8)}...</span>
-                                <span class="note-status ${statusClass}">${note.status}</span>
-                            </div>
-                            ${note.title ? `<div class="note-title">${note.title}</div>` : ''}
-                            <div class="note-content">${note.content}</div>
-                    `;
-                    // Show verify/reject buttons for moderators/admins on pending notes
-                    if (currentUser && (currentUser.role === 'moderator' || currentUser.role === 'admin' || currentUser.role === 'super_admin') && note.status === 'pending') {
-                        html += `
-                            <div class="note-actions">
-                                <button class="btn btn-small verify-note" data-id="${note.note_id}" data-action="verified">✅ Verify</button>
-                                <button class="btn btn-small reject-note" data-id="${note.note_id}" data-action="rejected">❌ Reject</button>
-                            </div>
-                        `;
-                    }
-                    html += `</div>`;
-                }
-                notesContainer.innerHTML = html;
-                // Attach event listeners to verify/reject buttons
-                document.querySelectorAll('.verify-note').forEach(btn => {
-                    btn.addEventListener('click', async (e) => {
-                        const noteId = btn.getAttribute('data-id');
-                        await verifyNote(noteId, 'verified');
-                    });
-                });
-                document.querySelectorAll('.reject-note').forEach(btn => {
-                    btn.addEventListener('click', async (e) => {
-                        const noteId = btn.getAttribute('data-id');
-                        const reason = prompt('Rejection reason (optional):');
-                        await verifyNote(noteId, 'rejected', reason);
-                    });
-                });
-            } catch (err) {
-                notesContainer.innerHTML = `<p>Error loading notes: ${err.message}</p>`;
-            }
-        }
-
-        async function verifyNote(noteId, status, rejectionReason = null) {
-            try {
-                await apiRequest(`/admin/notes/verify/${noteId}`, {
-                    method: 'POST',
-                    body: JSON.stringify({ status, rejection_reason: rejectionReason })
-                });
-                // Reload notes
-                if (currentGlobal) loadNotes(currentGlobal);
-            } catch (err) {
-                alert(`Failed to verify note: ${err.message}`);
-            }
-        }
-
-        async function addNote(globalAyahId, noteType, title, content) {
-            if (!globalAyahId || !content) return false;
-            try {
-                await apiRequest('/notes', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        ayah_global_id: globalAyahId,
-                        note_type: noteType,
-                        title: title,
-                        content: content
-                    })
-                });
-                return true;
-            } catch (err) {
-                alert(`Error adding note: ${err.message}`);
-                return false;
-            }
-        }
-
-        async function loadAyah(surah, ayah, lang) {
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('ayahContent').style.display = 'none';
-            try {
-                const data = await apiRequest(`/quran/ayah/enriched/${surah}/${ayah}?lang=${lang}`);
-                renderAyah(data);
-                navInfo = data.navigation;
-                currentSurah = surah;
-                currentAyah = ayah;
-                currentGlobal = data.ayah.global_ayah_number;
-                document.getElementById('jumpSurah').value = surah;
-                document.getElementById('jumpAyah').value = ayah;
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('ayahContent').style.display = 'block';
-                // Load notes for this ayah
-                await loadNotes(currentGlobal);
-            } catch (err) {
-                document.getElementById('loading').innerHTML = `<p class="error-message">Error: ${err.message}</p>`;
-            }
-        }
-
-        function renderAyah(data) {
-            const ayah = data.ayah;
-            const words = data.words;
-            const nav = data.navigation;
-
-            document.getElementById('surahName').innerHTML = nav.surah_name;
-            document.getElementById('surahMeaning').innerHTML = nav.surah_meaning || '';
-            document.getElementById('ayahNumber').innerText = ayah.ayah_number;
-            document.getElementById('globalNumber').innerText = ayah.global_ayah_number;
-            document.getElementById('arabicText').innerHTML = ayah.arabic_text;
-            document.getElementById('translationText').innerHTML = ayah.translation || '(No translation for this language)';
-
-            document.getElementById('totalAbjad').innerText = ayah.total_abjad;
-            document.getElementById('totalLetters').innerText = ayah.total_letters;
-            document.getElementById('totalSymbols').innerText = ayah.symbol_count || 0;
-            document.getElementById('totalWords').innerText = ayah.total_words;
-            document.getElementById('uniqueWords').innerText = ayah.unique_words_count;
-            document.getElementById('juz').innerText = ayah.juz;
-            document.getElementById('hizb').innerText = ayah.hizb;
-            document.getElementById('manzil').innerText = ayah.manzil;
-            document.getElementById('ruku').innerText = ayah.ruku;
-            document.getElementById('rukuPos').innerText = ayah.position_in_ruku;
-            const sajdahSpan = document.getElementById('sajdah');
-            if (ayah.sajdah) {
-                sajdahSpan.innerHTML = '<span class="sajdah-yes">✅ Sajdah Ayah</span>';
-            } else {
-                sajdahSpan.innerHTML = '❌ No';
-            }
-            document.getElementById('rukuEnd').innerHTML = ayah.ruku_end ? '✅ Yes' : '❌ No';
-
-            const wordsContainer = document.getElementById('wordsContainer');
-            wordsContainer.innerHTML = '';
-            words.forEach(word => {
-                const card = document.createElement('div');
-                card.className = 'word-card';
-                card.innerHTML = `
-                    <div class="word-arabic">${word.arabic}</div>
-                    <div class="word-translit">${word.transliteration || ''}</div>
-                    <div class="word-urdu">${word.urdu_meaning || ''}</div>
-                    <div class="word-english">${word.english_meaning || ''}</div>
-                    <div class="word-meta">Abjad: ${word.abjad} | Letters: ${word.letter_count}<br>Occurrences (this surah): ${word.occurrence_in_surah}</div>
-                `;
-                card.onclick = () => {
-                    alert(`Word: ${word.arabic}\nTransliteration: ${word.transliteration}\nUrdu: ${word.urdu_meaning}\nEnglish: ${word.english_meaning}\nAbjad: ${word.abjad}\nLetter Count: ${word.letter_count}\nOccurrences in this Surah: ${word.occurrence_in_surah}\nTotal in Quran: ${word.occurrence_total}`);
-                };
-                wordsContainer.appendChild(card);
-            });
-
-            const letterFreq = document.getElementById('letterFreqContainer');
-            letterFreq.innerHTML = '';
-            const letters = ayah.letter_frequency || {};
-            for (const [ch, cnt] of Object.entries(letters)) {
-                letterFreq.innerHTML += `<span class="tag">${ch}: ${cnt}</span>`;
-            }
-
-            const symbolFreq = document.getElementById('symbolFreqContainer');
-            symbolFreq.innerHTML = '';
-            const symbols = ayah.symbol_frequency || {};
-            const names = {
-                '\u064E': 'Fatḥa', '\u064F': 'Ḍamma', '\u0650': 'Kasra',
-                '\u0651': 'Shaddah', '\u0652': 'Sukūn', '\u064B': 'Fatḥatān',
-                '\u064C': 'Ḍammatān', '\u064D': 'Kasratān', '\u0670': 'Alif Khanjariyah'
-            };
-            for (const [sym, cnt] of Object.entries(symbols)) {
-                const display = names[sym] || sym;
-                symbolFreq.innerHTML += `<span class="tag">${display}: ${cnt}</span>`;
-            }
-
-            document.getElementById('prevBtn').disabled = !nav.prev;
-            document.getElementById('nextBtn').disabled = !nav.next;
-        }
-
-        // Event listeners
-        document.getElementById('langSelect').addEventListener('change', () => {
-            const lang = document.getElementById('langSelect').value;
-            loadAyah(currentSurah, currentAyah, lang);
-        });
-
-        document.getElementById('prevBtn').addEventListener('click', () => {
-            if (navInfo && navInfo.prev) {
-                window.location.href = `/ayah/${navInfo.prev.surah}/${navInfo.prev.ayah}`;
-            }
-        });
-
-        document.getElementById('nextBtn').addEventListener('click', () => {
-            if (navInfo && navInfo.next) {
-                window.location.href = `/ayah/${navInfo.next.surah}/${navInfo.next.ayah}`;
-            }
-        });
-
-        document.getElementById('jumpBtn').addEventListener('click', () => {
-            const surah = parseInt(document.getElementById('jumpSurah').value);
-            const ayah = parseInt(document.getElementById('jumpAyah').value);
-            if (surah && ayah && surah >= 1 && surah <= 114 && ayah >= 1) {
-                window.location.href = `/ayah/${surah}/${ayah}`;
-            } else {
-                alert('Please enter valid Surah (1-114) and Ayah number.');
-            }
-        });
-
-        document.getElementById('submitNoteBtn').addEventListener('click', async () => {
-            if (!currentUser) {
-                alert('Please login first.');
-                return;
-            }
-            const noteType = document.getElementById('noteType').value;
-            const title = document.getElementById('noteTitle').value;
-            const content = document.getElementById('noteContent').value.trim();
-            if (!content) {
-                alert('Note content cannot be empty.');
-                return;
-            }
-            const success = await addNote(currentGlobal, noteType, title, content);
-            if (success) {
-                document.getElementById('noteTitle').value = '';
-                document.getElementById('noteContent').value = '';
-                await loadNotes(currentGlobal);
-            }
-        });
-
-        // Initial load
-        if (currentSurah && currentAyah) {
-            const defaultLang = getUserLanguage() || 'ur';
-            document.getElementById('langSelect').value = defaultLang;
-            loadUser().then(() => loadAyah(currentSurah, currentAyah, defaultLang));
-        } else {
-            document.getElementById('loading').innerHTML = '<p class="error-message">Invalid ayah URL. <a href="/quran">Go to Surahs</a></p>';
-        }
-    </script>
 {% block extra_js %}
+<script>
+  (function() {
+    let currentSurah = null;
+    let currentAyah = null;
+    let currentGlobal = null;
+    let navInfo = null;
+    let currentUser = null;
 
-  
+    const pathParts = window.location.pathname.split('/');
+    if (pathParts.length >= 4 && pathParts[1] === 'ayah') {
+      currentSurah = parseInt(pathParts[2]);
+      currentAyah = parseInt(pathParts[3]);
+    }
+
+    async function loadUser() {
+      currentUser = await getCurrentUser();
+      updateNoteFormVisibility();
+    }
+
+    function updateNoteFormVisibility() {
+      const addNoteDiv = document.getElementById('addNoteForm');
+      const loginPrompt = document.getElementById('loginToNote');
+      if (currentUser) {
+        addNoteDiv.style.display = 'block';
+        loginPrompt.style.display = 'none';
+      } else {
+        addNoteDiv.style.display = 'none';
+        loginPrompt.style.display = 'block';
+      }
+    }
+
+    async function loadNotes(globalAyahId) {
+      const notesContainer = document.getElementById('notesList');
+      if (!globalAyahId) return;
+      notesContainer.innerHTML = '<p>Loading notes...</p>';
+      try {
+        const notes = await apiRequest(`/notes/ayah/${globalAyahId}`);
+        if (!notes || notes.length === 0) {
+          notesContainer.innerHTML = '<p>No community notes yet. Be the first to add one!</p>';
+          return;
+        }
+        let html = '';
+        for (const note of notes) {
+          let statusClass = '';
+          if (note.status === 'pending') statusClass = 'status-pending';
+          else if (note.status === 'verified') statusClass = 'status-verified';
+          else if (note.status === 'rejected') statusClass = 'status-rejected';
+          html += `
+            <div class="note-card" data-note-id="${note.note_id}">
+              <div class="note-header">
+                <span><strong>${note.note_type}</strong> by ${note.user_id.substring(0,8)}...</span>
+                <span class="note-status ${statusClass}">${note.status}</span>
+              </div>
+              ${note.title ? `<div class="note-title">${note.title}</div>` : ''}
+              <div class="note-content">${note.content}</div>
+          `;
+          if (currentUser && (currentUser.role === 'moderator' || currentUser.role === 'admin' || currentUser.role === 'super_admin') && note.status === 'pending') {
+            html += `
+              <div class="note-actions">
+                <button class="btn btn-small verify-note" data-id="${note.note_id}" data-action="verified">✅ Verify</button>
+                <button class="btn btn-small reject-note" data-id="${note.note_id}" data-action="rejected">❌ Reject</button>
+              </div>
+            `;
+          }
+          html += `</div>`;
+        }
+        notesContainer.innerHTML = html;
+        document.querySelectorAll('.verify-note').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const noteId = btn.getAttribute('data-id');
+            await verifyNote(noteId, 'verified');
+          });
+        });
+        document.querySelectorAll('.reject-note').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const noteId = btn.getAttribute('data-id');
+            const reason = prompt('Rejection reason (optional):');
+            await verifyNote(noteId, 'rejected', reason);
+          });
+        });
+      } catch (err) {
+        notesContainer.innerHTML = `<p>Error loading notes: ${err.message}</p>`;
+      }
+    }
+
+    async function verifyNote(noteId, status, rejectionReason = null) {
+      try {
+        await apiRequest(`/admin/notes/verify/${noteId}`, {
+          method: 'POST',
+          body: JSON.stringify({ status, rejection_reason: rejectionReason })
+        });
+        if (currentGlobal) loadNotes(currentGlobal);
+      } catch (err) {
+        alert(`Failed to verify note: ${err.message}`);
+      }
+    }
+
+    async function addNote(globalAyahId, noteType, title, content) {
+      if (!globalAyahId || !content) return false;
+      try {
+        await apiRequest('/notes', {
+          method: 'POST',
+          body: JSON.stringify({
+            ayah_global_id: globalAyahId,
+            note_type: noteType,
+            title: title,
+            content: content
+          })
+        });
+        return true;
+      } catch (err) {
+        alert(`Error adding note: ${err.message}`);
+        return false;
+      }
+    }
+
+    async function loadAyah(surah, ayah, lang) {
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('ayahContent').style.display = 'none';
+      try {
+        const data = await apiRequest(`/quran/ayah/enriched/${surah}/${ayah}?lang=${lang}`);
+        renderAyah(data);
+        navInfo = data.navigation;
+        currentSurah = surah;
+        currentAyah = ayah;
+        currentGlobal = data.ayah.global_ayah_number;
+        document.getElementById('jumpSurah').value = surah;
+        document.getElementById('jumpAyah').value = ayah;
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('ayahContent').style.display = 'block';
+        await loadNotes(currentGlobal);
+      } catch (err) {
+        document.getElementById('loading').innerHTML = `<p class="error-message">Error: ${err.message}</p>`;
+      }
+    }
+
+    function renderAyah(data) {
+      const ayah = data.ayah;
+      const words = data.words;
+      const nav = data.navigation;
+
+      document.getElementById('surahName').innerHTML = nav.surah_name;
+      document.getElementById('surahMeaning').innerHTML = nav.surah_meaning || '';
+      document.getElementById('ayahNumber').innerText = ayah.ayah_number;
+      document.getElementById('globalNumber').innerText = ayah.global_ayah_number;
+      document.getElementById('arabicText').innerHTML = ayah.arabic_text;
+      document.getElementById('translationText').innerHTML = ayah.translation || '(No translation for this language)';
+
+      document.getElementById('totalAbjad').innerText = ayah.total_abjad;
+      document.getElementById('totalLetters').innerText = ayah.total_letters;
+      document.getElementById('totalSymbols').innerText = ayah.symbol_count || 0;
+      document.getElementById('totalWords').innerText = ayah.total_words;
+      document.getElementById('uniqueWords').innerText = ayah.unique_words_count;
+      document.getElementById('juz').innerText = ayah.juz;
+      document.getElementById('hizb').innerText = ayah.hizb;
+      document.getElementById('manzil').innerText = ayah.manzil;
+      document.getElementById('ruku').innerText = ayah.ruku;
+      document.getElementById('rukuPos').innerText = ayah.position_in_ruku;
+      const sajdahSpan = document.getElementById('sajdah');
+      if (ayah.sajdah) {
+        sajdahSpan.innerHTML = '<span class="sajdah-yes">✅ Sajdah Ayah</span>';
+      } else {
+        sajdahSpan.innerHTML = '❌ No';
+      }
+      document.getElementById('rukuEnd').innerHTML = ayah.ruku_end ? '✅ Yes' : '❌ No';
+
+      const wordsContainer = document.getElementById('wordsContainer');
+      wordsContainer.innerHTML = '';
+      words.forEach(word => {
+        const card = document.createElement('div');
+        card.className = 'word-card';
+        card.innerHTML = `
+          <div class="word-arabic">${word.arabic}</div>
+          <div class="word-translit">${word.transliteration || ''}</div>
+          <div class="word-urdu">${word.urdu_meaning || ''}</div>
+          <div class="word-english">${word.english_meaning || ''}</div>
+          <div class="word-meta">Abjad: ${word.abjad} | Letters: ${word.letter_count}<br>Occurrences (this surah): ${word.occurrence_in_surah}</div>
+        `;
+        card.onclick = () => {
+          alert(`Word: ${word.arabic}\nTransliteration: ${word.transliteration}\nUrdu: ${word.urdu_meaning}\nEnglish: ${word.english_meaning}\nAbjad: ${word.abjad}\nLetter Count: ${word.letter_count}\nOccurrences in this Surah: ${word.occurrence_in_surah}\nTotal in Quran: ${word.occurrence_total}`);
+        };
+        wordsContainer.appendChild(card);
+      });
+
+      const letterFreq = document.getElementById('letterFreqContainer');
+      letterFreq.innerHTML = '';
+      const letters = ayah.letter_frequency || {};
+      for (const [ch, cnt] of Object.entries(letters)) {
+        letterFreq.innerHTML += `<span class="tag">${ch}: ${cnt}</span>`;
+      }
+
+      const symbolFreq = document.getElementById('symbolFreqContainer');
+      symbolFreq.innerHTML = '';
+      const symbols = ayah.symbol_frequency || {};
+      const names = {
+        '\u064E': 'Fatḥa', '\u064F': 'Ḍamma', '\u0650': 'Kasra',
+        '\u0651': 'Shaddah', '\u0652': 'Sukūn', '\u064B': 'Fatḥatān',
+        '\u064C': 'Ḍammatān', '\u064D': 'Kasratān', '\u0670': 'Alif Khanjariyah'
+      };
+      for (const [sym, cnt] of Object.entries(symbols)) {
+        const display = names[sym] || sym;
+        symbolFreq.innerHTML += `<span class="tag">${display}: ${cnt}</span>`;
+      }
+
+      document.getElementById('prevBtn').disabled = !nav.prev;
+      document.getElementById('nextBtn').disabled = !nav.next;
+    }
+
+    // Event listeners
+    document.getElementById('langSelect').addEventListener('change', () => {
+      const lang = document.getElementById('langSelect').value;
+      loadAyah(currentSurah, currentAyah, lang);
+    });
+
+    document.getElementById('prevBtn').addEventListener('click', () => {
+      if (navInfo && navInfo.prev) {
+        window.location.href = `/ayah/${navInfo.prev.surah}/${navInfo.prev.ayah}`;
+      }
+    });
+
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      if (navInfo && navInfo.next) {
+        window.location.href = `/ayah/${navInfo.next.surah}/${navInfo.next.ayah}`;
+      }
+    });
+
+    document.getElementById('jumpBtn').addEventListener('click', () => {
+      const surah = parseInt(document.getElementById('jumpSurah').value);
+      const ayah = parseInt(document.getElementById('jumpAyah').value);
+      if (surah && ayah && surah >= 1 && surah <= 114 && ayah >= 1) {
+        window.location.href = `/ayah/${surah}/${ayah}`;
+      } else {
+        alert('Please enter valid Surah (1-114) and Ayah number.');
+      }
+    });
+
+    document.getElementById('submitNoteBtn').addEventListener('click', async () => {
+      if (!currentUser) {
+        alert('Please login first.');
+        return;
+      }
+      const noteType = document.getElementById('noteType').value;
+      const title = document.getElementById('noteTitle').value;
+      const content = document.getElementById('noteContent').value.trim();
+      if (!content) {
+        alert('Note content cannot be empty.');
+        return;
+      }
+      const success = await addNote(currentGlobal, noteType, title, content);
+      if (success) {
+        document.getElementById('noteTitle').value = '';
+        document.getElementById('noteContent').value = '';
+        await loadNotes(currentGlobal);
+      }
+    });
+
+    // Initial load
+    if (currentSurah && currentAyah) {
+      const defaultLang = getUserLanguage() || 'ur';
+      document.getElementById('langSelect').value = defaultLang;
+      loadUser().then(() => loadAyah(currentSurah, currentAyah, defaultLang));
+    } else {
+      document.getElementById('loading').innerHTML = '<p class="error-message">Invalid ayah URL. <a href="/quran">Go to Surahs</a></p>';
+    }
+  })();
+</script>
 {% endblock %}
-  

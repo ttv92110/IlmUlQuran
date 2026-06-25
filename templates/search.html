@@ -24,7 +24,10 @@
         <option value="arabic">Arabic Text</option>
         <option value="ur">Urdu Translation</option>
         <option value="en">English Translation</option>
-        <!-- دیگر زبانیں -->
+        <option value="hi">Hindi Translation</option>
+        <option value="tr">Turkish Translation</option>
+        <option value="id">Indonesian Translation</option>
+        <option value="fa">Persian Translation</option>
       </select>
     </div>
     <button id="searchBtn" class="search-btn">Search Now</button>
@@ -33,91 +36,84 @@
 <div id="results" class="results-container"></div>
 {% endblock %}
 
-
-    <script src="/static/js/api.js"></script>
-    <script src="/static/js/auth.js"></script>
-
-    <script>
-        const searchTypeSelect = document.getElementById('searchType');
-        const langSelectorDiv = document.getElementById('languageSelector');
-        const searchBtn = document.getElementById('searchBtn');
-        const searchQuery = document.getElementById('searchQuery');
-        const resultsDiv = document.getElementById('results');
-
-        // Toggle language selector
-        searchTypeSelect.addEventListener('change', () => {
-            if (searchTypeSelect.value === 'fulltext') {
-                langSelectorDiv.style.display = 'block';
-            } else {
-                langSelectorDiv.style.display = 'none';
-            }
-        });
-
-        searchBtn.addEventListener('click', async () => {
-            const type = searchTypeSelect.value;
-            let query = searchQuery.value.trim();
-            if (!query) {
-                resultsDiv.innerHTML = '<div class="no-results">⚠️ Please enter a search term.</div>';
-                return;
-            }
-
-            resultsDiv.innerHTML = '<div style="text-align:center; padding:2rem;">⏳ Searching...</div>';
-            let url = '';
-
-            try {
-                if (type === 'word') {
-                    url = `/search/word?q=${encodeURIComponent(query)}`;
-                } 
-                else if (type === 'root') {
-                    url = `/search/root?root=${encodeURIComponent(query)}`;
-                } 
-                else if (type === 'abjad') {
-                    const num = parseInt(query);
-                    if (isNaN(num)) {
-                        resultsDiv.innerHTML = '<div class="no-results">❌ Please enter a valid number for Abjad value.</div>';
-                        return;
-                    }
-                    url = `/search/abjad?value=${num}`;
-                } 
-                else if (type === 'fulltext') {
-                    const lang = document.getElementById('searchLang').value;
-                    url = `/search/fulltext?q=${encodeURIComponent(query)}&language=${lang}`;
-                }
-
-                const results = await apiRequest(url);
-                if (!results || results.length === 0) {
-                    resultsDiv.innerHTML = '<div class="no-results">😔 No results found. Try a different keyword.</div>';
-                    return;
-                }
-
-                // Render clickable result cards
-                resultsDiv.innerHTML = results.map(ayah => `
-                    <div class="result-card" data-surah="${ayah.surah_number}" data-ayah="${ayah.ayah_number}">
-                        <div class="result-header">
-                            <span class="result-surah">📖 Surah ${ayah.surah_number}:${ayah.ayah_number}</span>
-                            <span class="result-abjad">🔢 Abjad: ${ayah.total_abjad}</span>
-                        </div>
-                        <div class="result-arabic">${ayah.arabic_text}</div>
-                        <div class="result-translation">${ayah.translations.ur || ayah.translations.en || 'Translation not available'}</div>
-                    </div>
-                `).join('');
-
-                // Add click handlers to each result card
-                document.querySelectorAll('.result-card').forEach(card => {
-                    card.addEventListener('click', () => {
-                        const surah = card.getAttribute('data-surah');
-                        const ayah = card.getAttribute('data-ayah');
-                        window.location.href = `/ayah/${surah}/${ayah}`;
-                    });
-                });
-            } catch (err) {
-                resultsDiv.innerHTML = `<div class="no-results">⚠️ Search failed: ${err.message}</div>`;
-            }
-        });
-
-        // Trigger initial state
-        searchTypeSelect.dispatchEvent(new Event('change'));
-    </script>
 {% block extra_js %}
- 
-{% endblock %} 
+<script>
+  (function() {
+    const searchTypeSelect = document.getElementById('searchType');
+    const langSelectorDiv = document.getElementById('languageSelector');
+    const searchBtn = document.getElementById('searchBtn');
+    const searchQuery = document.getElementById('searchQuery');
+    const resultsDiv = document.getElementById('results');
+
+    searchTypeSelect.addEventListener('change', () => {
+      if (searchTypeSelect.value === 'fulltext') {
+        langSelectorDiv.style.display = 'block';
+      } else {
+        langSelectorDiv.style.display = 'none';
+      }
+    });
+
+    searchBtn.addEventListener('click', async () => {
+      const type = searchTypeSelect.value;
+      let query = searchQuery.value.trim();
+      if (!query) {
+        resultsDiv.innerHTML = '<div class="no-results">⚠️ Please enter a search term.</div>';
+        return;
+      }
+
+      resultsDiv.innerHTML = '<div style="text-align:center; padding:2rem;">⏳ Searching...</div>';
+      let url = '';
+
+      try {
+        if (type === 'word') {
+          url = `/search/word?q=${encodeURIComponent(query)}`;
+        } 
+        else if (type === 'root') {
+          url = `/search/root?root=${encodeURIComponent(query)}`;
+        } 
+        else if (type === 'abjad') {
+          const num = parseInt(query);
+          if (isNaN(num)) {
+            resultsDiv.innerHTML = '<div class="no-results">❌ Please enter a valid number for Abjad value.</div>';
+            return;
+          }
+          url = `/search/abjad?value=${num}`;
+        } 
+        else if (type === 'fulltext') {
+          const lang = document.getElementById('searchLang').value;
+          url = `/search/fulltext?q=${encodeURIComponent(query)}&language=${lang}`;
+        }
+
+        const results = await apiRequest(url);
+        if (!results || results.length === 0) {
+          resultsDiv.innerHTML = '<div class="no-results">😔 No results found. Try a different keyword.</div>';
+          return;
+        }
+
+        resultsDiv.innerHTML = results.map(ayah => `
+          <div class="result-card" data-surah="${ayah.surah_number}" data-ayah="${ayah.ayah_number}">
+            <div class="result-header">
+              <span class="result-surah">📖 Surah ${ayah.surah_number}:${ayah.ayah_number}</span>
+              <span class="result-abjad">🔢 Abjad: ${ayah.total_abjad}</span>
+            </div>
+            <div class="result-arabic">${ayah.arabic_text}</div>
+            <div class="result-translation">${ayah.translations.ur || ayah.translations.en || 'Translation not available'}</div>
+          </div>
+        `).join('');
+
+        document.querySelectorAll('.result-card').forEach(card => {
+          card.addEventListener('click', () => {
+            const surah = card.getAttribute('data-surah');
+            const ayah = card.getAttribute('data-ayah');
+            window.location.href = `/ayah/${surah}/${ayah}`;
+          });
+        });
+      } catch (err) {
+        resultsDiv.innerHTML = `<div class="no-results">⚠️ Search failed: ${err.message}</div>`;
+      }
+    });
+
+    searchTypeSelect.dispatchEvent(new Event('change'));
+  })();
+</script>
+{% endblock %}

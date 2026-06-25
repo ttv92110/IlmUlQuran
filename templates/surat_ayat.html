@@ -12,84 +12,75 @@
 <div class="pagination" id="pagination"></div>
 {% endblock %}
 
-
-
-    <script src="/static/js/api.js"></script>
-    <script>
-        // Get surah number from URL query parameter ?surah=1
-        const urlParams = new URLSearchParams(window.location.search);
-        let surahNumber = urlParams.get('surah');
-        if (!surahNumber) {
-            // fallback: check if path like /surah/1 (use window.location.pathname)
-            const pathMatch = window.location.pathname.match(/\/surah\/(\d+)/);
-            if (pathMatch) surahNumber = pathMatch[1];
-        }
-        if (!surahNumber) {
-            document.getElementById('loading').innerHTML = '<p class="error-message">No surah specified. <a href="/quran">Go to Surah list</a></p>';
-        } else {
-            loadSurah(parseInt(surahNumber));
-        }
-
-        let currentPage = 1;
-        const pageSize = 20;
-
-        async function loadSurah(surahNum) {
-            try {
-                // Load surah info
-                const surahInfo = await apiRequest(`/quran/surah/${surahNum}`);
-                document.getElementById('surah-name').innerHTML = `${surahInfo.arabic_name} (${surahInfo.english_name}) - ${surahInfo.urdu_name}`;
-                document.getElementById('surah-meta').innerHTML = `${surahInfo.total_ayat} Ayahs | ${surahInfo.makki_madani} | Ruku: ${surahInfo.ruku_count}`;
-                document.getElementById('surah-info').style.display = 'block';
-                // Load first page of ayahs
-                await loadAyahs(surahNum, 1);
-                document.getElementById('loading').style.display = 'none';
-            } catch(err) {
-                document.getElementById('loading').innerHTML = `<p class="error-message">Error loading surah: ${err.message}</p>`;
-            }
-        }
-
-        async function loadAyahs(surahNum, page) {
-            const data = await apiRequest(`/quran/surah/${surahNum}/ayahs?page=${page}&page_size=${pageSize}`);
-            const container = document.getElementById('ayahs-container');
-            if (data.items.length === 0) {
-                container.innerHTML = '<p>No ayahs found. Please import Quran data.</p>';
-            } else {
-                container.innerHTML = data.items.map(ayah => `
-                    <div class="ayah-card">
-                        <div class="ayah-header">Ayah ${ayah.ayah_number}</div>
-                        <div class="arabic-text">${ayah.arabic_text}</div>
-                        <div class="translations">
-                            <div class="urdu">${ayah.translations.ur || ''}</div>
-                            <div class="english">${ayah.translations.en || ''}</div>
-                        </div>
-                        <div class="ayah-meta">
-                            Juz: ${ayah.juz_number} | Hizb: ${ayah.hizb_number} | Abjad: ${ayah.total_abjad}
-                        </div>
-                    </div>
-                `).join('');
-            }
-            renderPagination(data.total_pages, page, surahNumber);
-        }
-
-        function renderPagination(totalPages, current, surahNum) {
-            const container = document.getElementById('pagination');
-            if (totalPages <= 1) {
-                container.innerHTML = '';
-                return;
-            }
-            let html = '';
-            for(let i=1; i<=totalPages; i++) {
-                html += `<button class="page-btn ${i===current?'active':''}" data-page="${i}">${i}</button>`;
-            }
-            container.innerHTML = html;
-            document.querySelectorAll('.page-btn').forEach(btn => {
-                btn.addEventListener('click', () => loadAyahs(surahNum, parseInt(btn.dataset.page)));
-            });
-        }
-    </script> 
-    
 {% block extra_js %}
+<script>
+  (function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    let surahNumber = urlParams.get('surah');
+    if (!surahNumber) {
+      const pathMatch = window.location.pathname.match(/\/surah\/(\d+)/);
+      if (pathMatch) surahNumber = pathMatch[1];
+    }
+    if (!surahNumber) {
+      document.getElementById('loading').innerHTML = '<p class="error-message">No surah specified. <a href="/quran">Go to Surah list</a></p>';
+    } else {
+      loadSurah(parseInt(surahNumber));
+    }
 
+    let currentPage = 1;
+    const pageSize = 20;
 
+    async function loadSurah(surahNum) {
+      try {
+        const surahInfo = await apiRequest(`/quran/surah/${surahNum}`);
+        document.getElementById('surah-name').innerHTML = `${surahInfo.arabic_name} (${surahInfo.english_name}) - ${surahInfo.urdu_name}`;
+        document.getElementById('surah-meta').innerHTML = `${surahInfo.total_ayat} Ayahs | ${surahInfo.makki_madani} | Ruku: ${surahInfo.ruku_count}`;
+        document.getElementById('surah-info').style.display = 'block';
+        await loadAyahs(surahNum, 1);
+        document.getElementById('loading').style.display = 'none';
+      } catch(err) {
+        document.getElementById('loading').innerHTML = `<p class="error-message">Error loading surah: ${err.message}</p>`;
+      }
+    }
+
+    async function loadAyahs(surahNum, page) {
+      const data = await apiRequest(`/quran/surah/${surahNum}/ayahs?page=${page}&page_size=${pageSize}`);
+      const container = document.getElementById('ayahs-container');
+      if (data.items.length === 0) {
+        container.innerHTML = '<p>No ayahs found. Please import Quran data.</p>';
+      } else {
+        container.innerHTML = data.items.map(ayah => `
+          <div class="ayah-card">
+            <div class="ayah-header">Ayah ${ayah.ayah_number}</div>
+            <div class="arabic-text">${ayah.arabic_text}</div>
+            <div class="translations">
+              <div class="urdu">${ayah.translations.ur || ''}</div>
+              <div class="english">${ayah.translations.en || ''}</div>
+            </div>
+            <div class="ayah-meta">
+              Juz: ${ayah.juz_number} | Hizb: ${ayah.hizb_number} | Abjad: ${ayah.total_abjad}
+            </div>
+          </div>
+        `).join('');
+      }
+      renderPagination(data.total_pages, page, surahNum);
+    }
+
+    function renderPagination(totalPages, current, surahNum) {
+      const container = document.getElementById('pagination');
+      if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+      }
+      let html = '';
+      for(let i=1; i<=totalPages; i++) {
+        html += `<button class="page-btn ${i===current?'active':''}" data-page="${i}">${i}</button>`;
+      }
+      container.innerHTML = html;
+      document.querySelectorAll('.page-btn').forEach(btn => {
+        btn.addEventListener('click', () => loadAyahs(surahNum, parseInt(btn.dataset.page)));
+      });
+    }
+  })();
+</script>
 {% endblock %}
- 

@@ -21,107 +21,102 @@
 </div>
 {% endblock %}
 
-
-
-
-    <script src="/static/js/api.js"></script>
-    <script>
-        let currentData = null;
-        let chart = null;
-
-        // Load surahs for dropdown
-        async function loadSurahs() {
-            const data = await apiRequest('/quran/surahs?page=1&page_size=114');
-            const select = document.getElementById('surahSelect');
-            select.innerHTML = '<option value="">-- Choose Surah --</option>';
-            data.items.forEach(s => {
-                const option = document.createElement('option');
-                option.value = s.surah_number;
-                option.textContent = `${s.surah_number}. ${s.arabic_name} (${s.english_name})`;
-                select.appendChild(option);
-            });
-        }
-
-        async function loadSurahStats(surahNum) {
-            const data = await apiRequest(`/quran/analytics/surah/${surahNum}/letters`);
-            displayStats(data);
-            renderChart(data.letter_frequency, `Letter Frequency in Surah ${surahNum}`);
-        }
-
-        async function loadQuranStats() {
-            const data = await apiRequest(`/quran/analytics/quran/letters`);
-            displayTotalStats(data);
-            renderChart(data.letter_frequency, "Letter Frequency in Whole Quran");
-        }
-
-        function displayStats(data) {
-            const container = document.getElementById('statsContainer');
-            container.innerHTML = `
-                <div class="stats-grid">
-                    <div class="stat-card">📖 Surah: ${data.surah_name || 'Quran'}</div>
-                    <div class="stat-card">🔤 Total Letters: ${data.total_letters || data.total_letters}</div>
-                    <div class="stat-card">🆕 Unique Letters: ${data.unique_letters || Object.keys(data.letter_frequency || {}).length}</div>
-                    <div class="stat-card">📊 Diversity Score: ${data.diversity_score || 'N/A'}</div>
-                    ${data.most_common_letter ? `<div class="stat-card">⭐ Most Common: ${data.most_common_letter[0]} (${data.most_common_letter[1]} times)</div>` : ''}
-                    ${data.least_common_letter ? `<div class="stat-card">🔻 Least Common: ${data.least_common_letter[0]} (${data.least_common_letter[1]} times)</div>` : ''}
-                </div>
-            `;
-        }
-
-        function displayTotalStats(data) {
-            const container = document.getElementById('statsContainer');
-            container.innerHTML = `
-                <div class="stats-grid">
-                    <div class="stat-card">📖 Entire Quran</div>
-                    <div class="stat-card">🔤 Total Letters: ${data.total_letters}</div>
-                    <div class="stat-card">🆕 Unique Letters: ${Object.keys(data.letter_frequency).length}</div>
-                </div>
-            `;
-        }
-
-        function renderChart(frequency, title) {
-            const ctx = document.getElementById('letterChart').getContext('2d');
-            if (chart) chart.destroy();
-            const letters = Object.keys(frequency).sort();
-            const counts = letters.map(l => frequency[l]);
-            chart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: letters,
-                    datasets: [{
-                        label: 'Frequency',
-                        data: counts,
-                        backgroundColor: 'rgba(201, 163, 75, 0.6)',
-                        borderColor: 'rgba(11, 59, 47, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        title: { display: true, text: title },
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, title: { display: true, text: 'Count' } },
-                        x: { title: { display: true, text: 'Arabic Letters' } }
-                    }
-                }
-            });
-        }
-
-        document.getElementById('loadSurahBtn').addEventListener('click', () => {
-            const surah = document.getElementById('surahSelect').value;
-            if (surah) loadSurahStats(parseInt(surah));
-            else alert('Please select a surah');
-        });
-
-        document.getElementById('loadQuranBtn').addEventListener('click', () => {
-            loadQuranStats();
-        });
-
-        loadSurahs();
-    </script>
 {% block extra_js %}
- 
+<script>
+  (function() {
+    let chart = null;
+
+    async function loadSurahs() {
+      const data = await apiRequest('/quran/surahs?page=1&page_size=114');
+      const select = document.getElementById('surahSelect');
+      select.innerHTML = '<option value="">-- Choose Surah --</option>';
+      data.items.forEach(s => {
+        const option = document.createElement('option');
+        option.value = s.surah_number;
+        option.textContent = `${s.surah_number}. ${s.arabic_name} (${s.english_name})`;
+        select.appendChild(option);
+      });
+    }
+
+    async function loadSurahStats(surahNum) {
+      const data = await apiRequest(`/quran/analytics/surah/${surahNum}/letters`);
+      displayStats(data);
+      renderChart(data.letter_frequency, `Letter Frequency in Surah ${surahNum}`);
+    }
+
+    async function loadQuranStats() {
+      const data = await apiRequest(`/quran/analytics/quran/letters`);
+      displayTotalStats(data);
+      renderChart(data.letter_frequency, "Letter Frequency in Whole Quran");
+    }
+
+    function displayStats(data) {
+      const container = document.getElementById('statsContainer');
+      container.innerHTML = `
+        <div class="stats-grid">
+          <div class="stat-card">📖 Surah: ${data.surah_name || 'Quran'}</div>
+          <div class="stat-card">🔤 Total Letters: ${data.total_letters || data.total_letters}</div>
+          <div class="stat-card">🆕 Unique Letters: ${data.unique_letters || Object.keys(data.letter_frequency || {}).length}</div>
+          <div class="stat-card">📊 Diversity Score: ${data.diversity_score || 'N/A'}</div>
+          ${data.most_common_letter ? `<div class="stat-card">⭐ Most Common: ${data.most_common_letter[0]} (${data.most_common_letter[1]} times)</div>` : ''}
+          ${data.least_common_letter ? `<div class="stat-card">🔻 Least Common: ${data.least_common_letter[0]} (${data.least_common_letter[1]} times)</div>` : ''}
+        </div>
+      `;
+    }
+
+    function displayTotalStats(data) {
+      const container = document.getElementById('statsContainer');
+      container.innerHTML = `
+        <div class="stats-grid">
+          <div class="stat-card">📖 Entire Quran</div>
+          <div class="stat-card">🔤 Total Letters: ${data.total_letters}</div>
+          <div class="stat-card">🆕 Unique Letters: ${Object.keys(data.letter_frequency).length}</div>
+        </div>
+      `;
+    }
+
+    function renderChart(frequency, title) {
+      const ctx = document.getElementById('letterChart').getContext('2d');
+      if (chart) chart.destroy();
+      const letters = Object.keys(frequency).sort();
+      const counts = letters.map(l => frequency[l]);
+      chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: letters,
+          datasets: [{
+            label: 'Frequency',
+            data: counts,
+            backgroundColor: 'rgba(201, 163, 75, 0.6)',
+            borderColor: 'rgba(11, 59, 47, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: { display: true, text: title },
+            legend: { display: false }
+          },
+          scales: {
+            y: { beginAtZero: true, title: { display: true, text: 'Count' } },
+            x: { title: { display: true, text: 'Arabic Letters' } }
+          }
+        }
+      });
+    }
+
+    document.getElementById('loadSurahBtn').addEventListener('click', () => {
+      const surah = document.getElementById('surahSelect').value;
+      if (surah) loadSurahStats(parseInt(surah));
+      else alert('Please select a surah');
+    });
+
+    document.getElementById('loadQuranBtn').addEventListener('click', () => {
+      loadQuranStats();
+    });
+
+    loadSurahs();
+  })();
+</script>
 {% endblock %}
