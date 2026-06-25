@@ -285,6 +285,7 @@ class User(BaseModel):
     email_verified: bool = False
     verification_pin: Optional[str] = None
     pin_expires: Optional[datetime] = None
+    language: str = 'ur'   # نیا فیلڈ
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     last_login: Optional[datetime] = None
     
@@ -305,7 +306,7 @@ class User(BaseModel):
                 "is_active": True
             }
         }
-
+        
 # ==================== WORD ====================
 
 class Word(BaseModel):

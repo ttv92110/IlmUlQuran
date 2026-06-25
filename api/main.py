@@ -1,10 +1,13 @@
 # api/main.py
-from fastapi import FastAPI, Request
+from typing import Optional
+
+from fastapi import Depends, FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
+from api.core.common import get_current_user_optional, User
 
 from api.config import settings 
 from api.routers import auth_router, quran_router, abjad_router, notes_router, admin_router, search_router
@@ -74,9 +77,10 @@ TEMPLATES_DIR = BASE_DIR / "templates"
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 # HTML Routes
+
 @app.get("/")
-async def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+async def index(request: Request, current_user: Optional[User] = Depends(get_current_user_optional)):
+    return templates.TemplateResponse("index.html", {"request": request, "current_user": current_user})
 
 @app.get("/quran")
 async def quran_page(request: Request):

@@ -1,94 +1,71 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <!DOCTYPE html>
-<html lang="en">
-<head> 
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y7LDCTR5GX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+{% extends "base.html" %}
 
-    gtag('config', 'G-Y7LDCTR5GX');
-  </script>
-  <meta charset="UTF-8" />
+{% block title %}Login / Register{% endblock %}
 
-    <title>علم القرآن - Login / Register  </title>
-  <meta name="theme-color" content="#000" />
-  <meta name="author" content="Arshad Ali" /> 
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />   
-  <meta property="og:title" content="Arshad Ali | Ilm Ul Quran" />
-  <meta property="og:site_name" content="Arshad Ali Ilm Ul Quran" />
-  <meta name="twitter:title" content="Arshad Ali | Ilm Ul Quran" />
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/login.css" />
+{% endblock %}
 
-  <meta name="description" content="Arshad Ali | Ilm Ul Quran, Visit and know about me & my projects/designs. Visit my Ilm Ul Quran for a glimpse into my world of creativity, featuring streamlined content and captivating designs.Arshad Ali, Arshad Ali Ilm Ul Quran, Arshad Ali, Arshad Ali Ilm Ul Quran, Arshad Ali CV, 03401710232, +923401710232,Arshad Ali 03401710232,Arshad Ali +923401710232, Arshad Ali web, arsk92110@gmail.com, Arshad Ali arsk92110@gmail.com, Arshad Ali Linkdin, Arshad Ali Github, codewith Arshad Ali-py github, Code WithArshad Ali GitHub, Arshad Ali python Django, python developer, Arshad Ali data analyst, Arshad Ali developer, Arshad Ali Ilm Ul Quran Vercel, Arshad Ali Vercel Ilm Ul Quran" />
-  <meta name="keywords" content="Arshad Ali, Arshad Ali Ilm Ul Quran, Arshad Ali, Arshad Ali Ilm Ul Quran, Arshad Ali CV, 03401710232, +923401710232,Arshad Ali 03401710232,Arshad Ali +923401710232, Arshad Ali web, arsk92110@gmail.com, Arshad Ali arsk92110@gmail.com, Arshad Ali Linkdin, Arshad Ali Github, codewith Arshad Ali-py github, Code WithArshad Ali GitHub, Arshad Ali python Django, python developer, Arshad Ali data analyst, Arshad Ali developer, Arshad Ali Ilm Ul Quran Vercel, Arshad Ali Vercel Ilm Ul Quran" />
-  <meta property="og:description" content="Visit and know about me & my projects/designs. Innovative approach merging Django, Python, RESTApi, with simple content, clean design, and thoughtful interactions. Arshad Ali, Arshad Ali Ilm Ul Quran , Arshad Ali, Arshad Ali Ilm Ul Quran, Arshad Ali CV, 03401710232, +923401710232,Arshad Ali 03401710232,Arshad Ali +923401710232, Arshad Ali web, arsk92110@gmail.com, Arshad Ali arsk92110@gmail.com, Arshad Ali Linkdin, Arshad Ali Github, codewith Arshad Ali-py github, Code WithArshad Ali GitHub, Arshad Ali python Django, python developer, Arshad Ali data analyst, Arshad Ali developer, Arshad Ali Ilm Ul Quran Vercel, Arshad Ali Vercel Ilm Ul Quran" />
-  
-  <link rel="icon" type="image/x-icon" href="/static/images/ilm_ul_quran_icons.jpg" /> 
-  
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="/static/css/login.css">
-</head>
-<body>
+{% block content %}
 <div class="auth-card">
-    <div class="tabs">
-        <button class="tab-btn active" data-tab="login">🔐 Login</button>
-        <button class="tab-btn" data-tab="register">📝 Register</button>
-    </div>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="login">🔐 Login</button>
+    <button class="tab-btn" data-tab="register">📝 Register</button>
+  </div>
 
-    <!-- Login Pane -->
-    <div id="loginPane" class="tab-pane active">
-        <form id="loginForm">
-            <div class="form-group"><label>Email</label><input type="email" id="loginEmail" required></div>
-            <div class="form-group"><label>Password</label><input type="password" id="loginPassword" required></div>
-            <button type="submit" class="btn-primary">Login</button>
-            <div id="loginError" class="error-message"></div>
-        </form>
-        <div class="switch-text">Don't have an account? <a id="switchToRegister">Register here</a></div>
-    </div>
+  <!-- Login Pane -->
+  <div id="loginPane" class="tab-pane active">
+    <form id="loginForm">
+      <div class="form-group"><label>Email</label><input type="email" id="loginEmail" required></div>
+      <div class="form-group"><label>Password</label><input type="password" id="loginPassword" required></div>
+      <button type="submit" class="btn-primary">Login</button>
+      <div id="loginError" class="error-message"></div>
+    </form>
+    <div class="switch-text">Don't have an account? <a id="switchToRegister">Register here</a></div>
+  </div>
 
-    <!-- Register Pane -->
-    <div id="registerPane" class="tab-pane">
-        <form id="registerForm">
-            <div class="form-group"><label>Full Name *</label><input type="text" id="regName" required></div>
-            <div class="form-group"><label>Email *</label><input type="email" id="regEmail" required></div>
-            <div class="form-group"><label>Password * (min 8 chars)</label><input type="password" id="regPassword" required></div>
-            <div class="form-group"><label>Mobile Number *</label><input type="tel" id="regMobile" required></div>
-            <div class="form-group"><label>CNIC (13 digits) *</label><input type="text" id="regCnic" pattern="\d{13}" required></div>
-            <div class="form-group"><label>Profile Picture (optional)</label><input type="file" id="regProfilePic" accept="image/*" class="file-input"></div>
-            <div class="form-group"><label>CNIC Front Picture *</label><input type="file" id="regCnicPic" accept="image/*" required class="file-input"></div>
-            <div id="profilePreview" class="image-preview"></div>
-            <div id="cnicPreview" class="image-preview"></div>
-            <button type="submit" class="btn-primary">Register & Verify Email</button>
-            <div id="regError" class="error-message"></div>
-            <div id="regSuccess" class="success-message"></div>
-        </form>
-        <div class="switch-text">Already have an account? <a id="switchToLogin">Login here</a></div>
-    </div>
+  <!-- Register Pane -->
+  <div id="registerPane" class="tab-pane">
+    <form id="registerForm">
+      <!-- تمام رجسٹریشن فیلڈز -->
+      <div class="form-group"><label>Full Name *</label><input type="text" id="regName" required></div>
+      <div class="form-group"><label>Email *</label><input type="email" id="regEmail" required></div>
+      <div class="form-group"><label>Password *</label><input type="password" id="regPassword" required></div>
+      <div class="form-group"><label>Mobile *</label><input type="tel" id="regMobile" required></div>
+      <div class="form-group"><label>CNIC *</label><input type="text" id="regCnic" pattern="\d{13}" required></div>
+      <div class="form-group"><label>Profile Picture</label><input type="file" id="regProfilePic" accept="image/*"></div>
+      <div class="form-group"><label>CNIC Picture *</label><input type="file" id="regCnicPic" accept="image/*" required></div>
+      <div id="profilePreview" class="image-preview"></div>
+      <div id="cnicPreview" class="image-preview"></div>
+      <button type="submit" class="btn-primary">Register & Verify</button>
+      <div id="regError" class="error-message"></div>
+      <div id="regSuccess" class="success-message"></div>
+    </form>
+    <div class="switch-text">Already have an account? <a id="switchToLogin">Login here</a></div>
+  </div>
 </div>
 
 <!-- Verification Modal -->
 <div id="verificationModal" class="modal-overlay">
-    <div class="modal-content">
-        <h3>📧 Verify Your Email</h3>
-        <p>We sent a 6‑digit PIN to <strong id="verifyEmail"></strong>. Enter it below:</p>
-        <div class="pin-input">
-            <input type="text" maxlength="1" class="pin-digit"> <input type="text" maxlength="1" class="pin-digit">
-            <input type="text" maxlength="1" class="pin-digit"> <input type="text" maxlength="1" class="pin-digit">
-            <input type="text" maxlength="1" class="pin-digit"> <input type="text" maxlength="1" class="pin-digit">
-        </div>
-        <div id="verifyError" class="error-message"></div>
-        <div id="verifySuccess" class="success-message"></div>
-        <div class="modal-buttons">
-            <button id="verifyPinBtn" class="btn-primary">Verify</button>
-            <button id="resendPinBtn" class="btn-secondary">Resend PIN</button>
-        </div>
+  <div class="modal-content">
+    <h3>📧 Verify Your Email</h3>
+    <p>Enter 6‑digit PIN sent to <strong id="verifyEmail"></strong></p>
+    <div class="pin-input">
+      <input type="text" maxlength="1" class="pin-digit"> <input type="text" maxlength="1" class="pin-digit">
+      <input type="text" maxlength="1" class="pin-digit"> <input type="text" maxlength="1" class="pin-digit">
+      <input type="text" maxlength="1" class="pin-digit"> <input type="text" maxlength="1" class="pin-digit">
     </div>
+    <div id="verifyError" class="error-message"></div>
+    <div id="verifySuccess" class="success-message"></div>
+    <div class="modal-buttons">
+      <button id="verifyPinBtn" class="btn-primary">Verify</button>
+      <button id="resendPinBtn" class="btn-secondary">Resend PIN</button>
+    </div>
+  </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
 
 <script src="/static/js/api.js"></script>
 <script>
@@ -243,5 +220,6 @@
         }
     });
 </script>
-</body>
-</html>
+
+{% endblock %}
+ 

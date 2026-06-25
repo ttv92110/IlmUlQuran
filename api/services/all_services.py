@@ -176,7 +176,7 @@ class AuthService:
 
     async def register_user(self, name: str, email: str, password: str,
                             mobile: str, cnic: str, profile_pic_base64: str = "",
-                            cnic_pic_base64: str = "") -> Dict[str, Any]:
+                            cnic_pic_base64: str = "", language: str = "ur") -> Dict[str, Any]:
         existing_email = await self.user_repo.get_by_email(email)
         if existing_email:
             raise ValueError("Email already registered")
@@ -197,11 +197,12 @@ class AuthService:
             "email": email,
             "role": UserRole.USER.value,
             "hashed_password": self.hash_password(password),
-            "created_at": datetime.now(timezone.utc),
+            "created_at": datetime.now(timezone.utc),  # datetime object
             "last_login": None,
             "is_active": True,
             "mobile": mobile,
             "cnic": cnic,
+            "language": language,
             "profile_pic": profile_pic_path,
             "cnic_pic": cnic_pic_path,
             "email_verified": False,
@@ -225,10 +226,11 @@ class AuthService:
             raise ValueError("PIN expired. Request a new one.")
         user.email_verified = True
         user.verification_pin = None
-        user.pin_expires = None
+        user.pin_expires = None  # Set to None after verification
+        # Update user in repository
         await self.user_repo.update(user.user_id, user)
         return True
-
+    
     async def resend_pin(self, email: str) -> None:
         user = await self.user_repo.get_by_email(email)
         if not user:
@@ -253,7 +255,16 @@ class AuthService:
             raise ValueError("Email not verified. Please verify using the PIN sent to your email.")
         user.last_login = datetime.now(timezone.utc)
         await self.user_repo.update(user.user_id, user)
-        return {"user_id": user.user_id, "name": user.name, "email": user.email, "role": user.role.value}
+        
+        return {"user_id": user.user_id, "name": user.name, "email": user.email, "role": user.role.value, "language": user.language}
+    
+    async def update_user_language(self, user_id: str, language: str) -> Optional[User]:
+        user = await self.user_repo.get(user_id)
+        if user:
+            user.language = language
+            await self.user_repo.update(user_id, user)
+            return user
+        return None
 
 # ==================== AUTO ANALYSIS SERVICE ====================
 
@@ -766,7 +777,20 @@ class SearchEngine:
             if ayah:
                 results.append(ayah.dict())
         return results
-
+    
+    async def search_words_by_abjad(self, abjad_value: int) -> List[Dict]:
+        await self.ensure_index()
+        words = await self.word_repo.get_all(filters={"abjad_value": abjad_value}, limit=1000)
+        results = []
+        for word in words:
+            ayah = await self.ayah_repo.get_by_surah_ayah(word.surah_number, word.ayah_number)
+            if ayah:
+                results.append({
+                    "word": word.dict(),
+                    "ayah": ayah.dict()
+                })
+        return results
+    
     async def search_by_root(self, root: str) -> List[Dict]:
         words = await self.word_repo.get_by_root(root)
         ayah_ids = list(set(w.global_ayah_number for w in words))

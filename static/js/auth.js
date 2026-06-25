@@ -1,11 +1,14 @@
 // statics/js/auth.js
-async function login(email, password) {
+async function login(email, password, language = null) {
     const data = await apiRequest('/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password, language: language || getUserLanguage() || 'ur' })
     });
     localStorage.setItem('access_token', data.access_token);
     localStorage.setItem('refresh_token', data.refresh_token);
+    if (data.language) {
+        setUserLanguage(data.language);
+    }
     return data;
 }
 
@@ -25,6 +28,9 @@ async function logout() {
 async function getCurrentUser() {
     try {
         const user = await apiRequest('/auth/me');
+        if (user && user.language) {
+            setUserLanguage(user.language);
+        }
         return user;
     } catch (e) {
         return null;

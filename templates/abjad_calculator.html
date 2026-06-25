@@ -1,86 +1,188 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <!DOCTYPE html>
-<html lang="en">
-<head> 
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y7LDCTR5GX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+{% extends "base.html" %}
 
-    gtag('config', 'G-Y7LDCTR5GX');
-  </script>
-  <meta charset="UTF-8" />
+{% block title %}Abjad Calculator{% endblock %}
 
-    <title>علم القرآن - Abjad Calculator</title>
-  <meta name="theme-color" content="#000" />
-  <meta name="author" content="Arshad Ali" /> 
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />   
-  <meta property="og:title" content="Arshad Ali | Ilm Ul Quran" />
-  <meta property="og:site_name" content="Arshad Ali Ilm Ul Quran" />
-  <meta name="twitter:title" content="Arshad Ali | Ilm Ul Quran" />
-
-  <meta name="description" content="Arshad Ali | Ilm Ul Quran, Visit and know about me & my projects/designs. Visit my Ilm Ul Quran for a glimpse into my world of creativity, featuring streamlined content and captivating designs.Arshad Ali, Arshad Ali Ilm Ul Quran, Arshad Ali, Arshad Ali Ilm Ul Quran, Arshad Ali CV, 03401710232, +923401710232,Arshad Ali 03401710232,Arshad Ali +923401710232, Arshad Ali web, arsk92110@gmail.com, Arshad Ali arsk92110@gmail.com, Arshad Ali Linkdin, Arshad Ali Github, codewith Arshad Ali-py github, Code WithArshad Ali GitHub, Arshad Ali python Django, python developer, Arshad Ali data analyst, Arshad Ali developer, Arshad Ali Ilm Ul Quran Vercel, Arshad Ali Vercel Ilm Ul Quran" />
-  <meta name="keywords" content="Arshad Ali, Arshad Ali Ilm Ul Quran, Arshad Ali, Arshad Ali Ilm Ul Quran, Arshad Ali CV, 03401710232, +923401710232,Arshad Ali 03401710232,Arshad Ali +923401710232, Arshad Ali web, arsk92110@gmail.com, Arshad Ali arsk92110@gmail.com, Arshad Ali Linkdin, Arshad Ali Github, codewith Arshad Ali-py github, Code WithArshad Ali GitHub, Arshad Ali python Django, python developer, Arshad Ali data analyst, Arshad Ali developer, Arshad Ali Ilm Ul Quran Vercel, Arshad Ali Vercel Ilm Ul Quran" />
-  <meta property="og:description" content="Visit and know about me & my projects/designs. Innovative approach merging Django, Python, RESTApi, with simple content, clean design, and thoughtful interactions. Arshad Ali, Arshad Ali Ilm Ul Quran , Arshad Ali, Arshad Ali Ilm Ul Quran, Arshad Ali CV, 03401710232, +923401710232,Arshad Ali 03401710232,Arshad Ali +923401710232, Arshad Ali web, arsk92110@gmail.com, Arshad Ali arsk92110@gmail.com, Arshad Ali Linkdin, Arshad Ali Github, codewith Arshad Ali-py github, Code WithArshad Ali GitHub, Arshad Ali python Django, python developer, Arshad Ali data analyst, Arshad Ali developer, Arshad Ali Ilm Ul Quran Vercel, Arshad Ali Vercel Ilm Ul Quran" />
+{% block content %}
+<div class="container">
+  <h1>🔢 Abjad Calculator</h1>
+  <p>Enter an Arabic word or phrase to calculate its Abjad value, and see matching Ayahs and words.</p>
   
-  <link rel="icon" type="image/x-icon" href="/static/images/ilm_ul_quran_icons.jpg" />
- 
-    <link rel="stylesheet" href="/static/css/new_styles.css">
-</head>
-<body>
-    <div class="container">
-        <h1>🔢 Abjad Calculator</h1>
-        <input type="text" id="wordInput" placeholder="Type Arabic word/phrase (e.g., الله)">
-        <button id="calculateBtn">Calculate Abjad</button>
-        <div id="result"></div>
-        <hr>
-        <h3>Letter Mappings (click on any letter to add it to the input)</h3>
-        <div id="mappings" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:0.5rem;"></div>
-    </div>
-    
+  <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin: 1rem 0;">
+    <input type="text" id="wordInput" placeholder="Type Arabic word/phrase (e.g., الله)" style="flex:2; padding:0.8rem; border-radius:40px; border:2px solid #c9a34b; font-size:1.2rem;">
+    <button id="calculateBtn" class="btn" style="flex:1;">Calculate Abjad</button>
+  </div>
+  
+  <div id="result" style="font-size:2rem; font-weight:bold; text-align:center; background:#eef2e5; padding:1rem; border-radius:50px; margin:1rem 0;"></div>
+  
+  <hr>
+  
+  <div id="matchingAyahs" style="display:none; margin:1.5rem 0;">
+    <h3>📖 Ayahs with matching total Abjad</h3>
+    <div id="ayahList" style="display:flex; flex-direction:column; gap:0.8rem;"></div>
+  </div>
+  
+  <div id="matchingWords" style="display:none; margin:1.5rem 0;">
+    <h3>🔤 Words with matching Abjad</h3>
+    <div id="wordList" style="display:flex; flex-direction:column; gap:0.8rem;"></div>
+  </div>
+  
+  <div id="matchingGlobal" style="display:none; margin:1.5rem 0;">
+    <h3>🌍 Global Ayah number matches this Abjad</h3>
+    <div id="globalAyahLink"></div>
+  </div>
+  
+  <hr>
+  <h3>📋 Letter Mappings (click to add to input)</h3>
+  <div id="mappings" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:0.5rem;"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+
     <script src="/static/js/api.js"></script>
-    <script>
-        async function loadMappings() {
-            const mappings = await apiRequest('/abjad/mappings');
-            const container = document.getElementById('mappings');
-            container.innerHTML = mappings.map(m => `
-                <div class="mapping-item" data-letter="${m.letter}" style="background:#fff; padding:0.5rem; border-radius:12px; text-align:center; cursor:pointer; transition:0.2s;">
-                    <strong>${m.letter}</strong> = ${m.abjad_value}
-                </div>
-            `).join('');
+    <script src="/static/js/auth.js"></script>
+<script>
+    
+  (function() {
+    // --- حروف کی میپنگ لوڈ کریں ---
+    async function loadMappings() {
+      const mappings = await apiRequest('/abjad/mappings');
+      const container = document.getElementById('mappings');
+      container.innerHTML = mappings.map(m => `
+        <div class="mapping-item" data-letter="${m.letter}" style="background:#fff; padding:0.5rem; border-radius:12px; text-align:center; cursor:pointer; transition:0.2s; border:1px solid #ddd;">
+          <strong>${m.letter}</strong> = ${m.abjad_value}
+        </div>
+      `).join('');
 
-            // Add click listeners to each mapping div
-            document.querySelectorAll('.mapping-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    const letter = item.getAttribute('data-letter');
-                    const input = document.getElementById('wordInput');
-                    input.value += letter;   // Append the letter
-                    input.focus();           // Focus back to input for continuous typing
-                });
-                // Optional hover effect
-                item.addEventListener('mouseenter', () => {
-                    item.style.backgroundColor = '#c9a34b';
-                    item.style.color = 'white';
-                });
-                item.addEventListener('mouseleave', () => {
-                    item.style.backgroundColor = '#fff';
-                    item.style.color = '';
-                });
-            });
-        }
-
-        document.getElementById('calculateBtn').addEventListener('click', async () => {
-            const word = document.getElementById('wordInput').value.trim();
-            if(!word) return;
-            const data = await apiRequest(`/abjad/word/${encodeURIComponent(word)}`);
-            document.getElementById('result').innerHTML = `<div style="background:#eef2e5; padding:1rem; border-radius:50px; text-align:center;"><strong>Abjad Value:</strong> ${data.abjad_value}</div>`;
+      document.querySelectorAll('.mapping-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const letter = item.getAttribute('data-letter');
+          const input = document.getElementById('wordInput');
+          input.value += letter;
+          input.focus();
         });
+        item.addEventListener('mouseenter', () => {
+          item.style.backgroundColor = '#c9a34b';
+          item.style.color = 'white';
+        });
+        item.addEventListener('mouseleave', () => {
+          item.style.backgroundColor = '#fff';
+          item.style.color = '';
+        });
+      });
+    }
+    loadMappings();
 
-        loadMappings();
-    </script>
-</body>
-</html>
+    // --- حساب اور نتائج ---
+    document.getElementById('calculateBtn').addEventListener('click', async () => {
+      const word = document.getElementById('wordInput').value.trim();
+      if (!word) {
+        alert('Please enter a word or phrase.');
+        return;
+      }
+
+      // 1. ابجد ویلیو حاصل کریں
+      let abjadValue;
+      try {
+        const data = await apiRequest(`/abjad/word/${encodeURIComponent(word)}`);
+        abjadValue = data.abjad_value;
+        document.getElementById('result').innerHTML = `Abjad Value: <span style="color:#1e6b5e;">${abjadValue}</span>`;
+      } catch(err) {
+        document.getElementById('result').innerHTML = `Error: ${err.message}`;
+        return;
+      }
+
+      // 2. اس ویلیو کے ساتھ آیات تلاش کریں (سرچ انجن سے)
+      const ayahContainer = document.getElementById('matchingAyahs');
+      const ayahList = document.getElementById('ayahList');
+      ayahList.innerHTML = '';
+      try {
+        const ayahs = await apiRequest(`/search/abjad?value=${abjadValue}`);
+        if (ayahs && ayahs.length > 0) {
+          ayahContainer.style.display = 'block';
+          ayahs.forEach(ayah => {
+            const div = document.createElement('div');
+            div.className = 'result-card';
+            div.style.cursor = 'pointer';
+            div.innerHTML = `
+              <div style="display:flex; justify-content:space-between;">
+                <span><strong>Surah ${ayah.surah_number}:${ayah.ayah_number}</strong> (Global: ${ayah.global_ayah_number})</span>
+                <span>Abjad: ${ayah.total_abjad}</span>
+              </div>
+              <div class="arabic-text" style="font-size:1.4rem; direction:rtl; text-align:right;">${ayah.arabic_text}</div>
+              <div class="translations" style="font-size:0.9rem;">${ayah.translations.ur || ayah.translations.en || ''}</div>
+            `;
+            div.addEventListener('click', () => {
+              window.location.href = `/ayah/${ayah.surah_number}/${ayah.ayah_number}`;
+            });
+            ayahList.appendChild(div);
+          });
+        } else {
+          ayahContainer.style.display = 'none';
+        }
+      } catch(err) {
+        ayahContainer.style.display = 'none';
+        console.warn('No matching ayahs found');
+      }
+
+      // 3. اس ویلیو کے ساتھ الفاظ تلاش کریں
+      const wordContainer = document.getElementById('matchingWords');
+      const wordList = document.getElementById('wordList');
+      wordList.innerHTML = '';
+      try {
+        const wordsData = await apiRequest(`/search/abjad/words?value=${abjadValue}`);
+        if (wordsData && wordsData.length > 0) {
+          wordContainer.style.display = 'block';
+          wordsData.forEach(item => {
+            const word = item.word;
+            const ayah = item.ayah;
+            const div = document.createElement('div');
+            div.className = 'result-card';
+            div.style.cursor = 'pointer';
+            // ہائی لائٹ کی گئی لفظ (سرخ رنگ)
+            const highlightedText = ayah.arabic_text.replace(
+              new RegExp(word.arabic_word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+              `<span style="background-color:#ffd966; color:#c0392b; font-weight:bold;">${word.arabic_word}</span>`
+            );
+            div.innerHTML = `
+              <div style="display:flex; justify-content:space-between;">
+                <span><strong>Word:</strong> ${word.arabic_word} (Abjad: ${word.abjad_value})</span>
+                <span>in Surah ${word.surah_number}:${word.ayah_number}</span>
+              </div>
+              <div style="direction:rtl; text-align:right; font-size:1.2rem; font-family:'Amiri',serif;">${highlightedText}</div>
+              <div style="font-size:0.8rem; color:#6b6b6b;">Click to view full Ayah</div>
+            `;
+            div.addEventListener('click', () => {
+              // ہم اس لفظ کو ہائی لائٹ کرنے کے لیے ayah_detail صفحہ پر ?highlight=word بھیج سکتے ہیں، لیکن اس کے لیے اضافی کام ہوگا۔ اس لیے صرف آیت پر لے جائیں۔
+              window.location.href = `/ayah/${word.surah_number}/${word.ayah_number}`;
+            });
+            wordList.appendChild(div);
+          });
+        } else {
+          wordContainer.style.display = 'none';
+        }
+      } catch(err) {
+        wordContainer.style.display = 'none';
+        console.warn('No matching words found');
+      }
+
+      // 4. چیک کریں کہ آیا کوئی آیت کا گلوبل نمبر اس ویلیو کے برابر ہے
+      const globalContainer = document.getElementById('matchingGlobal');
+      const globalLink = document.getElementById('globalAyahLink');
+      try {
+        // ہم عالمی آیت نمبر کی تلاش کے لیے ایک علیحدہ API استعمال کر سکتے ہیں، لیکن یہاں ہم فرض کرتے ہیں کہ /quran/ayah/global/{num} موجود ہے۔
+        const ayah = await apiRequest(`/quran/ayah/global/${abjadValue}`);
+        if (ayah && ayah.global_ayah_number === abjadValue) {
+          globalContainer.style.display = 'block';
+          globalLink.innerHTML = `<a href="/ayah/${ayah.surah_number}/${ayah.ayah_number}" class="btn">🌍 Global Ayah #${abjadValue} — Surah ${ayah.surah_number}:${ayah.ayah_number}</a>`;
+        } else {
+          globalContainer.style.display = 'none';
+        }
+      } catch(err) {
+        globalContainer.style.display = 'none';
+      }
+    });
+
+  })();
+</script>
+{% endblock %}

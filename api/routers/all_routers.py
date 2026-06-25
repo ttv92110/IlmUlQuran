@@ -125,6 +125,7 @@ async def add_ayah_translation(
     await ayah_service.ayah_repo.update(f"{surah}_{ayah}", ayah_obj)
     return {"message": "Translation added", "language": data.language_code}
 
+
 @admin_router.post("/word/{word_id}/translation")
 async def add_word_translation(
     word_id: str, data: TranslationUpdate,
@@ -162,11 +163,38 @@ async def register(data: RegisterRequestExtended, auth_service: AuthService = De
     try:
         result = await auth_service.register_user(
             data.name, data.email, data.password,
-            data.mobile, data.cnic, data.profile_pic, data.cnic_pic
+            data.mobile, data.cnic, data.profile_pic, data.cnic_pic,
+            language=data.language or "ur"
         )
         return result
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@auth_router.post("/login", response_model=Token)
+async def login(data: LoginRequest, auth_service: AuthService = Depends(get_auth_service)):
+    try:
+        user = await auth_service.authenticate_user(data.email, data.password)
+        if not user:
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+        # اگر language بھیجا گیا ہے تو اسے اپ ڈیٹ کریں
+        if data.language:
+            await auth_service.update_user_language(user["user_id"], data.language)
+            user["language"] = data.language
+        access_token = auth_service.create_access_token({"sub": user["user_id"], "role": user["role"]})
+        refresh_token = auth_service.create_refresh_token({"sub": user["user_id"]})
+        return Token(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@auth_router.get("/me")
+async def get_me(current_user = Depends(get_current_user)):
+    return {
+        "user_id": current_user.user_id,
+        "name": current_user.name,
+        "email": current_user.email,
+        "role": current_user.role,
+        "language": current_user.language
+    }
 
 @auth_router.post("/verify-email")
 async def verify_email(data: VerifyEmailRequest, auth_service: AuthService = Depends(get_auth_service)):
@@ -183,23 +211,7 @@ async def resend_pin(data: ResendPinRequest, auth_service: AuthService = Depends
         return {"message": "New PIN sent to your email."}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-
-@auth_router.post("/login", response_model=Token)
-async def login(data: LoginRequest, auth_service: AuthService = Depends(get_auth_service)):
-    try:
-        user = await auth_service.authenticate_user(data.email, data.password)
-        if not user:
-            raise HTTPException(status_code=401, detail="Invalid credentials")
-        access_token = auth_service.create_access_token({"sub": user["user_id"], "role": user["role"]})
-        refresh_token = auth_service.create_refresh_token({"sub": user["user_id"]})
-        return Token(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-@auth_router.get("/me")
-async def get_me(current_user = Depends(get_current_user)):
-    return {"user_id": current_user.user_id, "name": current_user.name, "email": current_user.email}
-
+ 
 # ==================== NOTES ROUTES ====================
 notes_router = APIRouter(prefix="/notes", tags=["Notes"])
 
@@ -283,6 +295,13 @@ async def get_surah(surah_number: int):
     if not surah:
         raise HTTPException(404, "Surah not found")
     return SurahResponse(**surah.dict())
+
+@quran_router.get("/ayah/global/{global_number}")
+async def get_ayah_by_global(global_number: int, ayah_service: AyahService = Depends(get_ayah_service)):
+    ayah = await ayah_service.get_ayah_by_global(global_number)
+    if not ayah:
+        raise HTTPException(404, "Ayah not found")
+    return ayah.dict()
 
 @quran_router.get("/surah/{surah_number}/ayahs", response_model=PaginatedResponse[AyahResponse])
 async def get_surah_ayahs(
@@ -481,6 +500,15 @@ async def search_by_abjad(
     engine: SearchEngine = Depends(get_search_engine)
 ):
     results = await engine.search_by_abjad(value)
+    return results
+
+@search_router.get("/abjad/words")
+async def search_words_by_abjad(
+    value: int = Query(..., ge=1, le=1000000, description="Abjad value to search for"),
+    engine: SearchEngine = Depends(get_search_engine)
+):
+    """اس ابجد ویلیو کے ساتھ تمام الفاظ تلاش کریں۔"""
+    results = await engine.search_words_by_abjad(value)
     return results
 
 @search_router.get("/root")

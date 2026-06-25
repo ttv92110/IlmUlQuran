@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!DOCTYPE html>
+<html lang="en">
+<head> 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y7LDCTR5GX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-Y7LDCTR5GX');
+  </script>
+  <meta charset="UTF-8" />
+
+      <title>{% block title %} علم القرآن {% endblock %}</title>
+  <meta name="theme-color" content="#000" />
+  <meta name="author" content="Arshad Ali" /> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />   
+  <meta property="og:title" content="Arshad Ali | Ilm Ul Quran" />
+  <meta property="og:site_name" content="Arshad Ali Ilm Ul Quran" />
+  <meta name="twitter:title" content="Arshad Ali | Ilm Ul Quran" />
+
+  <meta name="description" content="Ilm Ul Quran - Quran Knowledge Platform | Quran, Abjad, Tafsir, Islamic Arshad Ali | Ilm Ul Quran, Visit and know about me & my projects/designs. Visit my Ilm Ul Quran for a glimpse into my world of creativity, featuring streamlined content and captivating designs.Arshad Ali, Arshad Ali Ilm Ul Quran, Arshad Ali, Arshad Ali Ilm Ul Quran, Arshad Ali CV, 03401710232, +923401710232,Arshad Ali 03401710232,Arshad Ali +923401710232, Arshad Ali web, arsk92110@gmail.com, Arshad Ali arsk92110@gmail.com, Arshad Ali Linkdin, Arshad Ali Github, codewith Arshad Ali-py github, Code WithArshad Ali GitHub, Arshad Ali python Django, python developer, Arshad Ali data analyst, Arshad Ali developer, Arshad Ali Ilm Ul Quran Vercel, Arshad Ali Vercel Ilm Ul Quran" />
+  <meta name="keywords" content="Ilm Ul Quran - Quran Knowledge Platform | Quran, Abjad, Tafsir, Islamic Arshad Ali, Arshad Ali Ilm Ul Quran, Arshad Ali, Arshad Ali Ilm Ul Quran, Arshad Ali CV, 03401710232, +923401710232,Arshad Ali 03401710232,Arshad Ali +923401710232, Arshad Ali web, arsk92110@gmail.com, Arshad Ali arsk92110@gmail.com, Arshad Ali Linkdin, Arshad Ali Github, codewith Arshad Ali-py github, Code WithArshad Ali GitHub, Arshad Ali python Django, python developer, Arshad Ali data analyst, Arshad Ali developer, Arshad Ali Ilm Ul Quran Vercel, Arshad Ali Vercel Ilm Ul Quran" />
+  <meta property="og:description" content="Ilm Ul Quran - Quran Knowledge Platform | Quran, Abjad, Tafsir, Islamic  Visit and know about me & my projects/designs. Innovative approach merging Django, Python, RESTApi, with simple content, clean design, and thoughtful interactions. Arshad Ali, Arshad Ali Ilm Ul Quran , Arshad Ali, Arshad Ali Ilm Ul Quran, Arshad Ali CV, 03401710232, +923401710232,Arshad Ali 03401710232,Arshad Ali +923401710232, Arshad Ali web, arsk92110@gmail.com, Arshad Ali arsk92110@gmail.com, Arshad Ali Linkdin, Arshad Ali Github, codewith Arshad Ali-py github, Code WithArshad Ali GitHub, Arshad Ali python Django, python developer, Arshad Ali data analyst, Arshad Ali developer, Arshad Ali Ilm Ul Quran Vercel, Arshad Ali Vercel Ilm Ul Quran" />
+   
+  <!-- ہر صفحے کا اضافی CSS (اگر ضرورت ہو) -->
+  {% block extra_css %}
+  
+  <link rel="icon" type="image/x-icon" href="/static/images/ilm_ul_quran_icons.jpg" /> 
+   
+  <meta name="theme-color" content="#000" />   
+  <link rel="icon" type="image/x-icon" href="/static/images/ilm_ul_quran_icons.jpg" />
+  <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Noto+Nastaliq+Urdu&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+   
+  <link rel="stylesheet" href="/static/css/new_styles.css" />
+  
+  {% endblock %}
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1 class="logo">علم القرآن</h1>
+      
+      <!-- نیویگیشن بار -->
+      <nav id="mainNav">
+        <button id="hamburgerBtn" aria-label="Toggle navigation">☰</button>
+        <ul id="navLinks">
+          <li><a href="/">Home</a></li>
+          <li><a href="/quran">Quran</a></li>
+          <li><a href="/search">Search</a></li>
+          <li><a href="/abjad">Abjad</a></li>
+          <li><a href="/analytics">Analytics</a></li>
+          <!-- ایڈمن لنک (صارف کے کردار کے مطابق JS کے ذریعے دکھائیں گے) -->
+          <li><a id="adminLink" href="/admin" style="display:none;">Admin</a></li>
+          <li>
+            <!-- زبان تبدیل کرنے کا ڈراپ‑ڈاؤن -->
+            <select id="langSelector" aria-label="Select language">
+              <option value="ur">اردو</option>
+              <option value="en">English</option>
+              <option value="hi">हिन्दी</option>
+              <option value="tr">Türkçe</option>
+              <option value="id">Bahasa Indonesia</option>
+              <option value="fa">فارسی</option>
+            </select>
+          </li>
+          <li>
+            <!-- عالمی سرچ فارم -->
+            <form id="globalSearchForm" action="/search" method="GET">
+              <input type="text" name="q" placeholder="Search..." aria-label="Search" />
+              <button type="submit">🔍</button>
+            </form>
+          </li>
+          <li>
+            <!-- تصدیق کے بٹن (لاگ ان/آؤٹ) -->
+            <div id="auth-buttons"></div>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header> 
+  <!-- مرکزی مواد -->
+  <main class="container">
+    {% block content %}
+    
+    
+  <footer>
+    <p>© 2025 Ilm Ul Quran — Open source knowledge platform</p>
+  </footer>
+    {% endblock %}
+  </main>
+
+
+  <!-- ہر صفحے کا اضافی JavaScript -->
+  {% block extra_js %}
+  
+  <!-- مشترکہ JavaScript فائلیں -->
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/auth.js"></script>
+  
+  <!-- مشترکہ JavaScript (نیویگیشن، زبان، ایڈمن لنک) -->
+  <script>
+    (function() {
+      // ---- ہیمبرگر مینو (موبائل) ----
+      const hamburger = document.getElementById('hamburgerBtn');
+      const navLinks = document.getElementById('navLinks');
+      if (hamburger && navLinks) {
+        hamburger.addEventListener('click', function() {
+          navLinks.classList.toggle('open');
+        });
+      }
+
+      // ---- زبان کا انتخاب ----
+      const langSelector = document.getElementById('langSelector');
+      const savedLang = localStorage.getItem('preferred_language') || 'ur';
+      langSelector.value = savedLang;
+      
+      langSelector.addEventListener('change', function() {
+        const newLang = this.value;
+        localStorage.setItem('preferred_language', newLang);
+        // صفحہ کو دوبارہ لوڈ کریں تاکہ تمام مواد نئی زبان میں آئے
+        window.location.reload();
+      });
+
+      // ---- نیویگیشن اور ایڈمن لنک اپ ڈیٹ کریں ----
+      async function updateNav() {
+        const authDiv = document.getElementById('auth-buttons');
+        const adminLink = document.getElementById('adminLink');
+        const token = localStorage.getItem('access_token');
+        
+        if (token) {
+          try {
+            const user = await apiRequest('/auth/me');
+            // اگر صارف ایڈمن یا موڈریٹر ہے تو ایڈمن لنک دکھائیں
+            if (user && (user.role === 'admin' || user.role === 'super_admin' || user.role === 'moderator')) {
+              adminLink.style.display = 'inline';
+            } else {
+              adminLink.style.display = 'none';
+            }
+            authDiv.innerHTML = `<button class="btn-logout" onclick="logout()">Logout</button>`;
+          } catch(e) {
+            authDiv.innerHTML = `<a href="/login">Login</a> | <a href="/register">Register</a>`;
+            adminLink.style.display = 'none';
+          }
+        } else {
+          authDiv.innerHTML = `<a href="/login">Login</a> | <a href="/register">Register</a>`;
+          adminLink.style.display = 'none';
+        }
+      }
+      updateNav();
+    })();
+  </script>
+  
+  {% endblock %}
+  

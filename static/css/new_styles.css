@@ -441,3 +441,54 @@ footer {
         flex-direction: column;
     }
 }
+
+
+/* ------------------------------------------------------------------------- */
+/* ===== موبائل نیویگیشن ===== */
+#hamburgerBtn {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+#navLinks {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (max-width: 768px) {
+  #hamburgerBtn {
+    display: block;
+  }
+  #navLinks {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    background: #0b3b2f;
+    padding: 1rem 0;
+    border-radius: 0 0 12px 12px;
+  }
+  #navLinks.open {
+    display: flex;
+  }
+  #navLinks li {
+    width: 100%;
+    text-align: center;
+  }
+  #navLinks form {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  #globalSearchForm input {
+    width: 80%;
+  }
+}

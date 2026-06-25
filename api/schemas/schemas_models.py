@@ -74,6 +74,17 @@ class AbjadMappingUpdate(BaseModel):
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
+    language: Optional[str] = 'ur'
+
+class RegisterRequestExtended(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+    mobile: str
+    cnic: str
+    profile_pic: Optional[str] = ""
+    cnic_pic: str
+    language: Optional[str] = 'ur'
 
 class RegisterRequest(BaseModel):
     name: str = Field(..., min_length=2, max_length=100)

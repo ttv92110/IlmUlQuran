@@ -3,7 +3,7 @@ import json
 import gspread
 import uuid
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, List, Dict, Any, Set
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -37,6 +37,8 @@ class BaseSheetsRepository:
         for key, value in data.items():
             if isinstance(value, (list, dict)):
                 data[key] = json.dumps(value, ensure_ascii=False)
+            elif isinstance(value, datetime):
+                data[key] = value.isoformat()  # Ensure datetime to ISO string
         return data
 
     def _from_dict(self, data: Dict, model_class):
@@ -44,7 +46,7 @@ class BaseSheetsRepository:
             return None
         cleaned = {}
         column_mapping = {'position': 'position_in_ayah'}
-        
+
         # Define string fields that should become empty string if None
         string_fields = {
             'mobile', 'cnic', 'verification_pin', 'user_id', 'name', 'email',
@@ -78,6 +80,20 @@ class BaseSheetsRepository:
                     cleaned[mapped_key] = 0
                 elif mapped_key in DATETIME_FIELDS:
                     cleaned[mapped_key] = None
+                else:
+                    cleaned[mapped_key] = None
+                continue
+
+            # ---------- Handle datetime fields ----------
+            if mapped_key in DATETIME_FIELDS:
+                if isinstance(v, str):
+                    try:
+                        # Try to parse ISO format with timezone
+                        cleaned[mapped_key] = datetime.fromisoformat(v.replace('Z', '+00:00'))
+                    except (ValueError, TypeError):
+                        cleaned[mapped_key] = None
+                elif isinstance(v, datetime):
+                    cleaned[mapped_key] = v
                 else:
                     cleaned[mapped_key] = None
                 continue
