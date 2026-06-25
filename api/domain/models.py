@@ -3,8 +3,7 @@
 from datetime import datetime, timezone
 from typing import Optional, List, Dict
 from enum import Enum
-from pydantic import BaseModel, Field, EmailStr
-
+from pydantic import BaseModel, Field, EmailStr, field_validator
 # ==================== ENUMS ====================
 
 class UserRole(str, Enum):
@@ -288,6 +287,13 @@ class User(BaseModel):
     pin_expires: Optional[datetime] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     last_login: Optional[datetime] = None
+    
+    @field_validator('last_login', mode='before')
+    @classmethod
+    def validate_last_login(cls, v):
+        if v == 'None' or v == '':
+            return None
+        return v
 
     class Config:
         json_schema_extra = {
