@@ -3,7 +3,7 @@ import json
 import gspread
 import uuid
 import logging
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Optional, List, Dict, Any, Set
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -113,7 +113,7 @@ class BaseSheetsRepository:
                 elif isinstance(v, str) and (v.startswith('[') or v.startswith('{')):
                     try:
                         cleaned[mapped_key] = json.loads(v)
-                    except:
+                    except Exception:
                         cleaned[mapped_key] = [] if mapped_key in ('juz_info', 'manzil_info', 'hizb_info', 'word_abjad_list') else {}
                 elif isinstance(v, list):
                     cleaned[mapped_key] = v
@@ -124,7 +124,7 @@ class BaseSheetsRepository:
                 if isinstance(v, str) and (v.startswith('[') or v.startswith('{')):
                     try:
                         cleaned[mapped_key] = json.loads(v)
-                    except:
+                    except Exception:
                         cleaned[mapped_key] = v
                 else:
                     cleaned[mapped_key] = v
