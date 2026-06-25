@@ -209,23 +209,27 @@
     }
 
     async function loadAyah(surah, ayah, lang) {
-      document.getElementById('loading').style.display = 'block';
-      document.getElementById('ayahContent').style.display = 'none';
-      try {
-        const data = await apiRequest(`/quran/ayah/enriched/${surah}/${ayah}?lang=${lang}`);
-        renderAyah(data);
-        navInfo = data.navigation;
-        currentSurah = surah;
-        currentAyah = ayah;
-        currentGlobal = data.ayah.global_ayah_number;
-        document.getElementById('jumpSurah').value = surah;
-        document.getElementById('jumpAyah').value = ayah;
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('ayahContent').style.display = 'block';
-        await loadNotes(currentGlobal);
-      } catch (err) {
-        document.getElementById('loading').innerHTML = `<p class="error-message">Error: ${err.message}</p>`;
-      }
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('ayahContent').style.display = 'none';
+        showLoader(`Loading Ayah ${surah}:${ayah}...`);
+        try {
+            const data = await apiRequest(`/quran/ayah/enriched/${surah}/${ayah}?lang=${lang}`, {}, false);
+            renderAyah(data);
+            navInfo = data.navigation;
+            currentSurah = surah;
+            currentAyah = ayah;
+            currentGlobal = data.ayah.global_ayah_number;
+            document.getElementById('jumpSurah').value = surah;
+            document.getElementById('jumpAyah').value = ayah;
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('ayahContent').style.display = 'block';
+            await loadNotes(currentGlobal);
+        } catch (err) {
+            document.getElementById('loading').innerHTML = `<p class="error-message">Error: ${err.message}</p>`;
+        } finally {
+            hideLoader();
+            document.getElementById('loading').style.display = 'none';
+        } 
     }
 
     function renderAyah(data) {

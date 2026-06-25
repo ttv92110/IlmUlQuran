@@ -132,20 +132,17 @@ class GoogleSheetsDB:
 
     def find_by_field(self, field: str, value: str):
         return [r for r in self.read_all() if str(r.get(field)) == str(value)]
- 
-
+    
     def insert(self, record: Dict):
         self._ensure_connected()
         if not self._worksheet:
             return record
 
-        # Generate ID if missing
         if 'id' not in record and 'note_id' not in record and 'user_id' not in record:
             record['id'] = str(uuid.uuid4())
         if 'created_at' not in record:
             record['created_at'] = datetime.utcnow().isoformat()
 
-        # Get headers from cache or fetch once
         cache_key = f"{self.sheet_name}_{self.worksheet_name}"
         if cache_key not in self._headers_cache:
             headers = self._worksheet.row_values(1)
@@ -155,12 +152,10 @@ class GoogleSheetsDB:
             self._headers_cache[cache_key] = headers
         headers = self._headers_cache[cache_key]
 
-        # Build row in header order
-        row = [str(record.get(h, "")) for h in headers]
+        # Convert None to empty string
+        row = [str(record.get(h, "")) if record.get(h) is not None else "" for h in headers]
 
-        # Append – no row count read needed
         self._worksheet.append_row(row)
-
         self._cache.clear()
         return record
 
@@ -175,7 +170,10 @@ class GoogleSheetsDB:
                 rec.update(updates)
                 rec['updated_at'] = datetime.utcnow().isoformat()
                 for col_idx, h in enumerate(headers, start=1):
-                    self._worksheet.update_cell(idx, col_idx, str(rec.get(h, "")))
+                    value = rec.get(h)
+                    # Convert None to empty string
+                    cell_value = str(value) if value is not None else ""
+                    self._worksheet.update_cell(idx, col_idx, cell_value)
                 self._cache.clear()
                 return rec
         return None

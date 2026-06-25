@@ -25,4 +25,25 @@ document.addEventListener('DOMContentLoaded', () => {
             if (langSelect) langSelect.value = user.language;
         }
     });
-});
+
+    document.querySelectorAll('a:not([target="_blank"])').forEach(link => {
+        link.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (href && !href.startsWith('#') && !href.startsWith('javascript:')) {
+                // صرف اندرونی لنکس کے لیے
+                if (href.startsWith('/') || href.startsWith(window.location.origin)) {
+                    showLoader('Loading page...');
+                }
+            }
+        });
+    });
+
+    // ہر فارم سبمٹ پر لوڈر (اختیاری)
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function (e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            if (submitBtn && !submitBtn.classList.contains('btn-loading')) {
+            }
+        });
+    });
+}); 

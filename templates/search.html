@@ -63,6 +63,11 @@
 
       resultsDiv.innerHTML = '<div style="text-align:center; padding:2rem;">⏳ Searching...</div>';
       let url = '';
+      
+        // Button loading
+        setButtonLoading(searchBtn, true);
+        resultsDiv.innerHTML = '<div style="text-align:center; padding:2rem;">⏳ Searching...</div>';
+
 
       try {
         if (type === 'word') {
@@ -107,10 +112,14 @@
             const ayah = card.getAttribute('data-ayah');
             window.location.href = `/ayah/${surah}/${ayah}`;
           });
+          
         });
+        
       } catch (err) {
-        resultsDiv.innerHTML = `<div class="no-results">⚠️ Search failed: ${err.message}</div>`;
-      }
+            resultsDiv.innerHTML = `<div class="no-results">⚠️ Search failed: ${err.message}</div>`;
+        } finally {
+            setButtonLoading(searchBtn, false);
+        }
     });
 
     searchTypeSelect.dispatchEvent(new Event('change'));

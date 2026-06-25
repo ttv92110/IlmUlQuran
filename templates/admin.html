@@ -38,25 +38,42 @@
       } catch(e) { console.error(e); }
     }
 
+    
     window.verifyNote = async (id, status) => {
-      await apiRequest(`/admin/notes/verify/${id}`, { method: 'POST', body: JSON.stringify({ status }) });
-      loadPendingNotes();
+    const btns = document.querySelectorAll(`[data-id="${id}"]`);
+    btns.forEach(b => setButtonLoading(b, true));
+    try {
+        await apiRequest(`/admin/notes/verify/${id}`, { method: 'POST', body: JSON.stringify({ status }) });
+        loadPendingNotes();
+    } catch(err) {
+        alert('Verification failed: ' + err.message);
+    } finally {
+        btns.forEach(b => setButtonLoading(b, false));
+    }
     };
 
     document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const data = {
-        surah: parseInt(formData.get('surah')),
-        ayah_number: parseInt(formData.get('ayah_number')),
-        arabic_text: formData.get('arabic_text'),
-        waqf: formData.get('waqf') || null,
-        sajdah: formData.has('sajdah'),
-        rukuEnd: formData.has('rukuEnd')
-      };
-      await apiRequest('/admin/ayah/upload', { method: 'POST', body: JSON.stringify(data) });
-      alert('Ayah uploaded');
-      e.target.reset();
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        setButtonLoading(btn, true);
+        try {
+            const formData = new FormData(e.target);
+            const data = {
+                surah: parseInt(formData.get('surah')),
+                ayah_number: parseInt(formData.get('ayah_number')),
+                arabic_text: formData.get('arabic_text'),
+                waqf: formData.get('waqf') || null,
+                sajdah: formData.has('sajdah'),
+                rukuEnd: formData.has('rukuEnd')
+            };
+            await apiRequest('/admin/ayah/upload', { method: 'POST', body: JSON.stringify(data) });
+            alert('Ayah uploaded');
+            e.target.reset();
+        } catch(err) {
+            alert('Upload failed: ' + err.message);
+        } finally {
+            setButtonLoading(btn, false);
+        }
     });
 
     loadPendingNotes();

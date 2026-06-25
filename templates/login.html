@@ -46,8 +46,14 @@
       <div class="form-group"><label>CNIC *</label><input type="text" id="regCnic" pattern="\d{13}" required></div>
       <div class="form-group"><label>Profile Picture</label><input type="file" id="regProfilePic" accept="image/*"></div>
       <div class="form-group"><label>CNIC Picture *</label><input type="file" id="regCnicPic" accept="image/*" required></div>
-      <div id="profilePreview" class="image-preview"></div>
-      <div id="cnicPreview" class="image-preview"></div>
+      <div class="row">
+            <div class="col">
+                <div id="profilePreview" class="image-preview"></div>
+            </div>
+            <div class="col"> 
+                <div id="cnicPreview" class="image-preview"></div>
+            </div>
+      </div>
       <button type="submit" class="btn-primary">Register & Verify</button>
       <div id="regError" class="error-message"></div>
       <div id="regSuccess" class="success-message"></div>
@@ -134,7 +140,9 @@
 
     // Registration
     document.getElementById('registerForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        setButtonLoading(btn, true);
       const name = document.getElementById('regName').value.trim();
       const email = document.getElementById('regEmail').value.trim();
       const password = document.getElementById('regPassword').value;
@@ -173,7 +181,9 @@
         document.getElementById('cnicPreview').innerHTML = '';
       } catch (err) {
         errorDiv.innerText = err.detail || err.message || 'Registration failed.';
-      }
+      } finally {
+         setButtonLoading(btn, false);
+        }
     });
 
     // PIN entry
@@ -209,7 +219,9 @@
 
     // Login
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        setButtonLoading(btn, true);
       const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value;
       const errorDiv = document.getElementById('loginError');
@@ -231,6 +243,9 @@
           errorDiv.innerText = errorMsg || 'Login failed.';
         }
       }
+       finally {
+            setButtonLoading(btn, false);
+        }
     });
   })();
 

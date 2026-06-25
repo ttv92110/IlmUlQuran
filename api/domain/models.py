@@ -263,6 +263,7 @@ class RegisterRequestExtended(BaseModel):
     cnic: str
     profile_pic: Optional[str] = ""
     cnic_pic: str
+    language: Optional[str] = 'ur'   
 
 class VerifyEmailRequest(BaseModel):
     email: EmailStr

@@ -39,15 +39,29 @@
     }
 
     async function loadSurahStats(surahNum) {
-      const data = await apiRequest(`/quran/analytics/surah/${surahNum}/letters`);
-      displayStats(data);
-      renderChart(data.letter_frequency, `Letter Frequency in Surah ${surahNum}`);
+        showLoader(`Loading analytics for Surah ${surahNum}...`);
+        try {
+            const data = await apiRequest(`/quran/analytics/surah/${surahNum}/letters`, {}, false);
+            displayStats(data);
+            renderChart(data.letter_frequency, `Letter Frequency in Surah ${surahNum}`);
+        } catch(err) {
+            alert('Error loading stats: ' + err.message);
+        } finally {
+            hideLoader();
+        }
     }
 
     async function loadQuranStats() {
-      const data = await apiRequest(`/quran/analytics/quran/letters`);
-      displayTotalStats(data);
-      renderChart(data.letter_frequency, "Letter Frequency in Whole Quran");
+        showLoader('Loading Quran analytics...');
+        try {
+            const data = await apiRequest(`/quran/analytics/quran/letters`, {}, false);
+            displayTotalStats(data);
+            renderChart(data.letter_frequency, "Letter Frequency in Whole Quran");
+        } catch(err) {
+            alert('Error loading stats: ' + err.message);
+        } finally {
+            hideLoader();
+        }
     }
 
     function displayStats(data) {

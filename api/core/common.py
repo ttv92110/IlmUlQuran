@@ -8,6 +8,7 @@ import smtplib
 import base64
 import logging
 import sys
+import os
 from pathlib import Path
 from logging.handlers import RotatingFileHandler
 from datetime import datetime, timezone, timedelta
@@ -257,7 +258,7 @@ async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] =
     if not user_id:
         raise HTTPException(status_code=401, detail="Invalid token payload")
     # Lazy import to avoid circular dependency
-    from api.repositories.sheets.user_sheets_repo import UserSheetsRepository
+    from api.repositories.sheets.sheets_repositories import UserSheetsRepository
     repo = UserSheetsRepository()
     user = await repo.get(user_id)
     if not user:
@@ -297,7 +298,7 @@ SMTP_PASSWORD = None
 FROM_EMAIL = None
 
 # Load from environment (could also use settings, but keep as is)
-import os
+ 
 SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
 SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
 SMTP_USER = os.getenv("SMTP_USER")

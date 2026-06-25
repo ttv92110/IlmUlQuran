@@ -85,13 +85,18 @@ class BaseSheetsRepository:
                 continue
 
             # ---------- Handle datetime fields ----------
+            
             if mapped_key in DATETIME_FIELDS:
                 if isinstance(v, str):
-                    try:
-                        # Try to parse ISO format with timezone
-                        cleaned[mapped_key] = datetime.fromisoformat(v.replace('Z', '+00:00'))
-                    except (ValueError, TypeError):
+                    # اگر string "None" ہے تو None سیٹ کریں
+                    if v.strip().lower() == 'none' or v.strip() == '':
                         cleaned[mapped_key] = None
+                    else:
+                        try:
+                            # ISO format parse کریں
+                            cleaned[mapped_key] = datetime.fromisoformat(v.replace('Z', '+00:00'))
+                        except (ValueError, TypeError):
+                            cleaned[mapped_key] = None
                 elif isinstance(v, datetime):
                     cleaned[mapped_key] = v
                 else:

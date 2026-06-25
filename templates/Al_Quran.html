@@ -23,23 +23,30 @@
     const pageSize = 20;
 
     async function loadSurahs() {
-      const data = await apiRequest('/quran/surahs?page=1&page_size=114');
-      const container = document.getElementById('surahs-container');
-      container.innerHTML = data.items.map(s => `
-        <div class="surah-card" data-surah="${s.surah_number}">
-          <div class="surah-num">${s.surah_number}</div>
-          <div class="surah-name-ar">${s.arabic_name}</div>
-          <div class="surah-name-ur">${s.urdu_name}</div>
-          <div class="surah-name-en">${s.english_name}</div>
-          <div class="surah-ayat">${s.total_ayat} Ayahs</div>
-        </div>
-      `).join('');
-      document.querySelectorAll('.surah-card').forEach(card => {
-        card.addEventListener('click', () => {
-          const surahNum = parseInt(card.dataset.surah);
-          window.location.href = `/ayah/${surahNum}/1`;
-        });
-      });
+        showLoader('Loading Surahs...');
+        try {
+            const data = await apiRequest('/quran/surahs?page=1&page_size=114', {}, false);
+            const container = document.getElementById('surahs-container');
+            container.innerHTML = data.items.map(s => `
+                <div class="surah-card" data-surah="${s.surah_number}">
+                <div class="surah-num">${s.surah_number}</div>
+                <div class="surah-name-ar">${s.arabic_name}</div>
+                <div class="surah-name-ur">${s.urdu_name}</div>
+                <div class="surah-name-en">${s.english_name}</div>
+                <div class="surah-ayat">${s.total_ayat} Ayahs</div>
+                </div>
+            `).join('');
+            document.querySelectorAll('.surah-card').forEach(card => {
+                card.addEventListener('click', () => {
+                const surahNum = parseInt(card.dataset.surah);
+                window.location.href = `/ayah/${surahNum}/1`;
+                });
+            });
+                } catch(err) {
+                // error handling
+            } finally {
+                hideLoader();
+        }
     }
 
     async function loadAyahs(surahNum, page = 1) {

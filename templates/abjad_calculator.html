@@ -69,21 +69,26 @@
     loadMappings();
 
     document.getElementById('calculateBtn').addEventListener('click', async () => {
-      const word = document.getElementById('wordInput').value.trim();
-      if (!word) {
-        alert('Please enter a word or phrase.');
-        return;
-      }
+        const btn = document.getElementById('calculateBtn');
+        const word = document.getElementById('wordInput').value.trim();
+        if (!word) {
+            alert('Please enter a word or phrase.');
+            return;
+        }
+
+        // Button loading state
+        setButtonLoading(btn, true);
 
       let abjadValue;
       try {
-        const data = await apiRequest(`/abjad/word/${encodeURIComponent(word)}`);
-        abjadValue = data.abjad_value;
-        document.getElementById('result').innerHTML = `Abjad Value: <span style="color:#1e6b5e;">${abjadValue}</span>`;
-      } catch(err) {
-        document.getElementById('result').innerHTML = `Error: ${err.message}`;
-        return;
-      }
+            const data = await apiRequest(`/abjad/word/${encodeURIComponent(word)}`);
+            const abjadValue = data.abjad_value;
+            document.getElementById('result').innerHTML = `Abjad Value: <span style="color:#1e6b5e;">${abjadValue}</span>`;
+      }  catch(err) {
+            document.getElementById('result').innerHTML = `Error: ${err.message}`;
+        } finally {
+            setButtonLoading(btn, false);
+        }
 
       // Matching Ayahs
       const ayahContainer = document.getElementById('matchingAyahs');
