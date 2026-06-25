@@ -72,9 +72,8 @@
 
 {% endblock %}
 
-{% block extra_js %}
 
- 
+
     <script src="/static/js/api.js"></script>
     <script src="/static/js/auth.js"></script>
     <script>
@@ -346,5 +345,8 @@
             document.getElementById('loading').innerHTML = '<p class="error-message">Invalid ayah URL. <a href="/quran">Go to Surahs</a></p>';
         }
     </script>
+{% block extra_js %}
+
+  
 {% endblock %}
   
