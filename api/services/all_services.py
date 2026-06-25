@@ -158,9 +158,19 @@ class AuthService:
         self.user_repo = user_repo
 
     def hash_password(self, password: str) -> str:
+        # bcrypt has 72-byte limit on passwords
+        password_bytes = password.encode('utf-8')
+        if len(password_bytes) > 72:
+            password_bytes = password_bytes[:72]
+            password = password_bytes.decode('utf-8', errors='ignore')
         return pwd_context.hash(password)
 
     def verify_password(self, plain: str, hashed: str) -> bool:
+        # also truncate during verification
+        plain_bytes = plain.encode('utf-8')
+        if len(plain_bytes) > 72:
+            plain_bytes = plain_bytes[:72]
+            plain = plain_bytes.decode('utf-8', errors='ignore')
         return pwd_context.verify(plain, hashed)
 
     def create_access_token(self, data: dict, expires_delta: Optional[timedelta] = None) -> str:

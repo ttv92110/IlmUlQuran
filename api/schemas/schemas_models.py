@@ -76,6 +76,7 @@ class LoginRequest(BaseModel):
     password: str
     language: Optional[str] = 'ur'
 
+
 class RegisterRequestExtended(BaseModel):
     name: str
     email: EmailStr
@@ -86,10 +87,24 @@ class RegisterRequestExtended(BaseModel):
     cnic_pic: str
     language: Optional[str] = 'ur'
 
+    @validator('password')
+    def validate_password_length(cls, v):
+        if len(v.encode('utf-8')) > 72:
+            raise ValueError('Password must not exceed 72 bytes (approximately 72 characters)')
+        return v
+
+
 class RegisterRequest(BaseModel):
     name: str = Field(..., min_length=2, max_length=100)
     email: EmailStr
     password: str = Field(..., min_length=8)
+
+    @validator('password')
+    def validate_password_length(cls, v):
+        # Check byte length (not character length) because bcrypt limit is 72 bytes
+        if len(v.encode('utf-8')) > 72:
+            raise ValueError('Password must not exceed 72 bytes (approximately 72 characters)')
+        return v
 
 class Token(BaseModel):
     access_token: str

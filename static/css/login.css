@@ -1,22 +1,4 @@
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #fef9e6 0%, #f5ebd2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-        }
-        .auth-card {
-            background: white;
-            border-radius: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 500px;
-            overflow: hidden;
-        }
+  
         .tabs { display: flex; border-bottom: 1px solid #e0d5c0; }
         .tab-btn {
             flex: 1; background: none; border: none; padding: 1.2rem;
