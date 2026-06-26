@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Optional, List, Dict, Any, Tuple
 from collections import Counter
 from datetime import datetime, timedelta, timezone
+import bcrypt
 
 from jose import jwt
 from passlib.context import CryptContext 
@@ -157,21 +158,17 @@ class AuthService:
     def __init__(self, user_repo: UserRepository):
         self.user_repo = user_repo
 
+        
     def hash_password(self, password: str) -> str:
-        # bcrypt has 72-byte limit on passwords
-        password_bytes = password.encode('utf-8')
-        if len(password_bytes) > 72:
-            password_bytes = password_bytes[:72]
-            password = password_bytes.decode('utf-8', errors='ignore')
-        return pwd_context.hash(password)
+        # bcrypt 72-byte limit
+        password_bytes = password.encode('utf-8')[:72]
+        salt = bcrypt.gensalt()
+        return bcrypt.hashpw(password_bytes, salt).decode('utf-8')
 
     def verify_password(self, plain: str, hashed: str) -> bool:
-        # also truncate during verification
-        plain_bytes = plain.encode('utf-8')
-        if len(plain_bytes) > 72:
-            plain_bytes = plain_bytes[:72]
-            plain = plain_bytes.decode('utf-8', errors='ignore')
-        return pwd_context.verify(plain, hashed)
+        plain_bytes = plain.encode('utf-8')[:72]
+        hashed_bytes = hashed.encode('utf-8')
+        return bcrypt.checkpw(plain_bytes, hashed_bytes)
 
     def create_access_token(self, data: dict, expires_delta: Optional[timedelta] = None) -> str:
         to_encode = data.copy()

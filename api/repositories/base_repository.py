@@ -16,7 +16,7 @@ class BaseRepository(ABC, Generic[T]):
     @abstractmethod
     async def get(self, id: str) -> Optional[T]:
         """Get single entity by its unique ID."""
-        pass
+        pass 
     
     @abstractmethod
     async def get_all(self, filters: Optional[Dict[str, Any]] = None, 
@@ -44,8 +44,7 @@ class BaseRepository(ABC, Generic[T]):
         """Check if any entity matches the given filters."""
         pass
 
-# ==================== Simple Google Sheets Repository (synchronous) ====================
-# Used by legacy or simple CRUD operations (not used by sheet repositories currently)
+# ==================== Simple Google Sheets Repository (synchronous) ==================== 
 
 class SimpleSheetsRepository:
     """Simple synchronous repository for direct dict operations on Google Sheets."""
